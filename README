@@ -1,0 +1,8 @@
+Helpful
+https://socket.io/docs/emit-cheatsheet/
+
+Make sure you run
+npm i
+before attempting to run.
+
+Run in dev mode with npm run dev
