@@ -1,7 +1,7 @@
-import Chess from 'chess.js';
-import React from 'react';
+const { Chess } = require('chess.js');
+const React = require('react');
 
-export default class Game extends React.Component {
+class Game extends React.Component {
   constructor() {
     super();
     this.board = new Chess();
@@ -10,7 +10,7 @@ export default class Game extends React.Component {
   }
 
   addPlayer(p) {
-    this.players.append(p);
+    this.players.push(p);
   }
 
   move(m) {
@@ -32,3 +32,5 @@ export default class Game extends React.Component {
   }
   */
 }
+
+module.exports = Game;

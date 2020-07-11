@@ -1,6 +1,6 @@
-import React from 'react';
+const React = require('react');
 
-export default class Player extends React.Component {
+class Player extends React.Component {
   constructor(c, id) {
     super();
     this.color = c;
@@ -13,3 +13,5 @@ export default class Player extends React.Component {
   }
   */
 }
+
+module.exports = Player;
