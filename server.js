@@ -20,6 +20,7 @@ io.on("connection", socket => {
 	   	console.log(username + " has requested a new game");
 	   	let gameId = newGame(socket.id);
 	   	console.log("new gameId:", gameId);
+	   	socket.emit("gameId", gameId);
 	   	//reuse userJoin to update user's profile
 	   	let user = userJoin(socket.id, username, gameId);
 

@@ -12,5 +12,11 @@ function joinGame(){
 	socket.emit("joinGame", {username, gameId});
 }
 
-socket.on("game", msg => {console.log(msg)});
+socket.on("game", (msg) => {
+  	console.log(msg);
+});
+
+socket.on("gameId", (gameId) => {
+	document.getElementById("generated-game-id").innerHTML = "Game Id: " + gameId;
+});
 
