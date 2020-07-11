@@ -1,7 +1,7 @@
 {
   "name": "SE-181-Team-Project",
   "version": "1.0.0",
-  "description": "",
+  "description": "Helpful https://socket.io/docs/emit-cheatsheet/",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,6 +24,9 @@
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
+    "eslint": "^7.4.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
     "nodemon": "^2.0.4"
   }
 }
