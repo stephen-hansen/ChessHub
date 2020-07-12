@@ -81,17 +81,47 @@ class Board {
     return board;
   }
 
+  isValidMove(piece, m) {
+    // Check that the move is valid and that it does not cause check
+    return piece.isValidMove(m, this) && !this.causesCheck(piece, m);
+  }
+
+  causesCheck(piece, m) {
+    // Simulate the move and see if it places the player in check
+    const p = piece.getPosition();
+    this.board[p[0]][p[1]] = null;
+    this.board[m[0]][m[1]] = piece;
+    const causesCheck = this.isCheck();
+    // Undo the move
+    this.board[p[0]][p[1]] = piece;
+    this.board[m[0]][m[1]] = null;
+
+    return causesCheck;
+  }
+
+  filterMoves(piece) {
+    const finalMoves = [];
+    const moves = piece.getMoves();
+    for (let i = 0; i < moves.length; i += 1) {
+      const move = moves[i];
+      if (!(this.causesCheck(piece, move))) {
+        finalMoves.push(moves);
+      }
+    }
+    return finalMoves;
+  }
+
   applyMove(p, m) {
     const piece = this.board[p[0]][p[1]];
     if (piece === null) {
       return;
     }
-    if (!(piece.isValidMove(m, this))) {
+    if (!(this.isValidMove(piece, m))) {
       return;
     }
-    piece.setPosition(m);
     this.board[p[0]][p[1]] = null;
     this.board[m[0]][m[1]] = piece;
+    piece.setPosition(m);
     this.turn = this.getOpponent();
   }
 
@@ -127,8 +157,6 @@ class Board {
   }
 
   isCheckmate() {
-    // TODO
-
     // 1. If board.isCheck() is false, return false
     if (!(this.isCheck())) {
       return false;
@@ -140,13 +168,12 @@ class Board {
       if (piece.getColor() === this.turn
       && piece.isActive()) {
         // 4. Generate all moves for the piece
-        const moves = piece.getMoves();
-        // 5. Create a copy of the board
-        // TODO
-        // 6. Apply the move to the board copy
-        // TODO
-        // 7. If boardCopy.isCheck() is false, return false
-        // TODO
+        // Filter moves out which maintain check
+        const moves = this.filterMoves(piece);
+        // A move exists which gets out of check
+        if (moves.length > 0) {
+          return false;
+        }
       }
     }
     // 8. Return true
@@ -162,7 +189,8 @@ class Board {
       const piece = this.pieces[i];
       if (piece.getColor() === this.turn
       && piece.isActive()) {
-        const moves = piece.getMoves();
+        const moves = this.filterMoves(piece);
+        // A move exists.
         if (moves.length > 0) {
           return false;
         }
@@ -171,6 +199,10 @@ class Board {
 
     return true;
   }
+
+  // TODO
+  // add conditions for castling
+  // add conditions for en passant
 }
 
 module.exports = Board;
