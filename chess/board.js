@@ -127,7 +127,54 @@ class Board {
     this.board[p[0]][p[1]] = null;
     this.board[m[0]][m[1]] = piece;
     piece.setPosition(m);
+    // Verify en Passant if it occurs
+    this.enPassant();
     this.turn = this.getOpponent();
+  }
+
+  enPassant() {
+    for (let i = 0; i < this.pieces.length; i += 1) {
+      const piece = this.pieces[i];
+      const row = piece.getPosition()[0];
+      const col = piece.getPosition()[1];
+      const opponent = this.getOpponent();
+      // Find an opponent's piece in en passant, if it exists
+      if (piece.getColor() === opponent
+      && piece instanceof Pawn
+      && piece.isActive()
+      && piece.isEnPassant()) {
+        // Disable it since the turn is over
+        piece.disableEnPassant();
+        let captureSpot = null;
+        if (piece.getColor() === white) {
+          captureSpot = this.board[row - 1][col];
+        } else {
+          captureSpot = this.board[row + 1][col];
+        }
+        // Check if the player put a pawn in capture spot
+        if (captureSpot !== null
+          && captureSpot.getColor() === this.turn
+          && captureSpot instanceof Pawn) {
+          // Remove the piece if player just captured
+          this.board[row][col] = null;
+          piece.setActive(false);
+        }
+        break; // Only one piece may be en passant at a time.
+      }
+    }
+  }
+
+  isPromotion() {
+    for (let i = 0; i < this.pieces.length; i += 1) {
+      const piece = this.pieces[i];
+      const row = piece.getPosition()[0];
+      const color = piece.getColor();
+      if (piece instanceof Pawn
+        && (row === 0 || row === 7)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   isCheck() {
@@ -207,7 +254,9 @@ class Board {
 
   // TODO
   // add conditions for castling
-  // add conditions for en passant
+  // add history
+  // check promotion and en passant ONLY after a pawn move 
+  // implement promotion
 }
 
 module.exports = Board;
