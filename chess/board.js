@@ -83,18 +83,19 @@ class Board {
 
   isValidMove(piece, m) {
     // Check that the move is valid and that it does not cause check
-    return piece.isValidMove(m, this) && !this.causesCheck(piece, m);
+    return piece.isActive() && piece.isValidMove(m, this) && !this.causesCheck(piece, m);
   }
 
   causesCheck(piece, m) {
     // Simulate the move and see if it places the player in check
     const p = piece.getPosition();
+    const temp = this.board[m[0]][m[1]];
     this.board[p[0]][p[1]] = null;
     this.board[m[0]][m[1]] = piece;
     const causesCheck = this.isCheck();
     // Undo the move
     this.board[p[0]][p[1]] = piece;
-    this.board[m[0]][m[1]] = null;
+    this.board[m[0]][m[1]] = temp;
 
     return causesCheck;
   }
@@ -118,6 +119,10 @@ class Board {
     }
     if (!(this.isValidMove(piece, m))) {
       return;
+    }
+    const pieceAtMove = this.board[m[0]][m[1]];
+    if (pieceAtMove !== null) {
+      pieceAtMove.setActive(false);
     }
     this.board[p[0]][p[1]] = null;
     this.board[m[0]][m[1]] = piece;

@@ -11,6 +11,10 @@ class Piece {
     return this.active;
   }
 
+  setActive(a) {
+    this.active = a;
+  }
+
   getColor() {
     return this.color;
   }
