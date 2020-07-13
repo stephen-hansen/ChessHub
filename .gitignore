@@ -27,6 +27,7 @@ hs_err_pid*
 .*~
 *.swo
 *.swp
+*.swn
 
 # Node
 node_modules/

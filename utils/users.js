@@ -10,9 +10,13 @@ function userJoin(id, username, gameId){
    	return newUser;
 }
 
+//remove user from memory
+//return the game that they were in so we can remove them from the game as well
 function userLeave(id) {
+   	let game = users[id].gameId;
 	delete users[id];
    	console.log("removed " + id + " from memory");
+	return game;
 }
 
 function getUsers() { return users }

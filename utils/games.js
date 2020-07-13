@@ -14,14 +14,33 @@ function generate(count){
 }
 
 //return all games that only have one player in it
-function newGame(playerSocket){
+function newGame(){
    	let gameId = generate(5);
-   	games[gameId] = [playerSocket];
+   	games[gameId] = [];
    	return gameId
 }
 
+//joins a user to a game
 function joinGame(gameId, playerSocket){
-	games[gameId].push(playerSocket);
+   	console.log("socket: " + playerSocket + " has joined game: " + gameId);
+   	if(games[gameId])
+		games[gameId].push(playerSocket);
+}
+
+//remove a user from a game
+function leaveGame(gameId, playerSocket){
+   	console.log("socket: " + playerSocket + " has left game: " + gameId);
+   	if(games[gameId])
+		games[gameId].pop(playerSocket);	
+}
+
+//determines if a game is joinable 
+function gameJoinable(gameId){
+   	if(games[gameId]) {
+		return games[gameId].length < 2;
+	} else {
+		return false;
+	}
 }
 
 function getGames() { return games; }
@@ -29,5 +48,7 @@ function getGames() { return games; }
 module.exports = { 
 	newGame,
    	joinGame,
+   	gameJoinable,
+   	leaveGame,
    	getGames
 };

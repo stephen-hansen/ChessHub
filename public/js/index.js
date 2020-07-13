@@ -1,22 +1,37 @@
-const socket = io();
-
 function createGame(){
    	let username = document.getElementById("username").value;
-	socket.emit("createGame", username);
+   	
+   	//need to make a request for a new gameId
+   	fetch("http://localhost:8080/api/createGame", {
+		method: "POST",
+	   	mode: "cors",
+	}).then((response) => {
+	   	response.json()
+		  .then((json) => {
+			   //redirect user to the game
+			   window.location.href="/g?username=" + username + "&gameId=" + json.gameId;
+			});
+		})
+	  .catch(err => {console.log(err)});	
 }
-
 
 function joinGame(){
    	let username = document.getElementById("username").value;
    	let gameId = document.getElementById("game-id").value;
-	socket.emit("joinGame", {username, gameId});
+   		
+	//need to make a request for a new gameId
+   	fetch("http://localhost:8080/api/joinGame", {
+		method: "POST",
+	   	body: JSON.stringify({ gameId: gameId }),
+	   	headers: {"Content-Type": "application/json"},
+	}).then((response) => {
+	   		if(response.ok) {
+				//redirect user to the game
+				window.location.href="/g?username=" + username + "&gameId=" + gameId;
+			} else {
+				console.log("game is either full or does not exist");
+			}
+	  
+		})
+	  .catch(err => { console.log(err) });	
 }
-
-socket.on("game", (msg) => {
-  	console.log(msg);
-});
-
-socket.on("gameId", (gameId) => {
-	document.getElementById("generated-game-id").innerHTML = "Game Id: " + gameId;
-});
-
