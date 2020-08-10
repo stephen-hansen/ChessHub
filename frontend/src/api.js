@@ -6,9 +6,9 @@ function createGame(){
     
     //need to make a request for a new gameId
     fetch("http://localhost:8080/api/createGame", {
-   method: "POST",
+   	  method: "POST",
       mode: "cors",
-  }).then((response) => {
+  	}).then((response) => {
       response.json()
      .then((json) => {
         //redirect user to the game
@@ -27,7 +27,7 @@ function createGame(){
    method: "POST",
       body: JSON.stringify({ gameId: gameId }),
       headers: {"Content-Type": "application/json"},
-  }).then((response) => {
+  	}).then((response) => {
         if(response.ok) {
        //redirect user to the game
        window.location.href="/g?username=" + username + "&gameId=" + gameId;

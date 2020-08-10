@@ -4,6 +4,7 @@ const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const port = process.env.PORT || 8080;
 
 const { newGame, joinGame, gameJoinable, leaveGame, getGames } = require("./utils/games.js");
@@ -13,6 +14,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(cors());
 
 app.get("/g", (req,res) => {
    	let { username, gameId } = req.query;
@@ -24,6 +27,7 @@ app.get("/g", (req,res) => {
 
 //create a new game
 app.post("/api/createGame", (req,res) => {
+   	console.log("inside create game");
 	let id = newGame();				
    	console.log("created Game: " + id);
    	res.send({ gameId: id });

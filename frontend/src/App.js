@@ -9,9 +9,9 @@ function App() {
     <div className="mainPage">
 	   <h1> ChessHub </h1>
 	   <h3> Please create a game or join a game</h3>
-		<label id="username" required>Username</label><br />
+		<label id="username-label" required>Username</label><br />
 		<input type="text" id="username" name="username" /> <br />
-		<label id="game-id">Game id</label>	<br />
+		<label id="game-id-label">Game id</label>	<br />
 		<input type="text" id="game-id" name="game-id" /> <br />
 		<div className="action">
 		<button id="create" onClick={createGame}>Create Game</button>
