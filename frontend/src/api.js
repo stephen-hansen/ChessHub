@@ -11,6 +11,7 @@ function createGame(){
   	}).then((response) => {
       response.json()
      .then((json) => {
+       
         //redirect user to the game
         window.location.href="/g?username=" + username + "&gameId=" + json.gameId;
      });
