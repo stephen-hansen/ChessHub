@@ -7,256 +7,288 @@ const { Knight } = require('./knight.js');
 const { Pawn } = require('./pawn.js');
 const { Queen } = require('./queen.js');
 const { Rook } = require('./rook.js');
+const { Move } = require('./move.js');
 
 class Board {
-  constructor() {
-    this.pieces = this.createPieces();
-    this.board = this.loadBoard();
-    this.turn = white;
-  }
+	constructor() {
+		this.board = this.loadBoard(this.createPieces());
+		this.turn = white;
+		this.history = [];
+	}
 
-  getOpponent() {
-    if (this.turn === white) {
-      return black;
-    }
-    return white;
-  }
+	getOpponent() {
+		if (this.turn === white) {
+			return black;
+		}
+		return white;
+	}
 
-  createPieces() {
-    const pieces = [];
+	createPieces() {
+		const pieces = [];
 
-    pieces.push(new Rook(white, (0, 0)));
-    pieces.push(new Knight(white, (0, 1)));
-    pieces.push(new Bishop(white, (0, 2)));
-    pieces.push(new Queen(white, (0, 3)));
-    pieces.push(new King(white, (0, 4)));
-    pieces.push(new Bishop(white, (0, 5)));
-    pieces.push(new Knight(white, (0, 6)));
-    pieces.push(new Rook(white, (0, 7)));
-    pieces.push(new Pawn(white, (1, 0)));
-    pieces.push(new Pawn(white, (1, 1)));
-    pieces.push(new Pawn(white, (1, 2)));
-    pieces.push(new Pawn(white, (1, 3)));
-    pieces.push(new Pawn(white, (1, 4)));
-    pieces.push(new Pawn(white, (1, 5)));
-    pieces.push(new Pawn(white, (1, 6)));
-    pieces.push(new Pawn(white, (1, 7)));
+		pieces.push(new Rook(white, (0, 0)));
+		pieces.push(new Knight(white, (0, 1)));
+		pieces.push(new Bishop(white, (0, 2)));
+		pieces.push(new Queen(white, (0, 3)));
+		pieces.push(new King(white, (0, 4)));
+		pieces.push(new Bishop(white, (0, 5)));
+		pieces.push(new Knight(white, (0, 6)));
+		pieces.push(new Rook(white, (0, 7)));
+		pieces.push(new Pawn(white, (1, 0)));
+		pieces.push(new Pawn(white, (1, 1)));
+		pieces.push(new Pawn(white, (1, 2)));
+		pieces.push(new Pawn(white, (1, 3)));
+		pieces.push(new Pawn(white, (1, 4)));
+		pieces.push(new Pawn(white, (1, 5)));
+		pieces.push(new Pawn(white, (1, 6)));
+		pieces.push(new Pawn(white, (1, 7)));
 
-    pieces.push(new Rook(black, (7, 0)));
-    pieces.push(new Knight(black, (7, 1)));
-    pieces.push(new Bishop(black, (7, 2)));
-    pieces.push(new Queen(black, (7, 3)));
-    pieces.push(new King(black, (7, 4)));
-    pieces.push(new Bishop(black, (7, 5)));
-    pieces.push(new Knight(black, (7, 6)));
-    pieces.push(new Rook(black, (7, 7)));
-    pieces.push(new Pawn(black, (6, 0)));
-    pieces.push(new Pawn(black, (6, 1)));
-    pieces.push(new Pawn(black, (6, 2)));
-    pieces.push(new Pawn(black, (6, 3)));
-    pieces.push(new Pawn(black, (6, 4)));
-    pieces.push(new Pawn(black, (6, 5)));
-    pieces.push(new Pawn(black, (6, 6)));
-    pieces.push(new Pawn(black, (6, 7)));
+		pieces.push(new Rook(black, (7, 0)));
+		pieces.push(new Knight(black, (7, 1)));
+		pieces.push(new Bishop(black, (7, 2)));
+		pieces.push(new Queen(black, (7, 3)));
+		pieces.push(new King(black, (7, 4)));
+		pieces.push(new Bishop(black, (7, 5)));
+		pieces.push(new Knight(black, (7, 6)));
+		pieces.push(new Rook(black, (7, 7)));
+		pieces.push(new Pawn(black, (6, 0)));
+		pieces.push(new Pawn(black, (6, 1)));
+		pieces.push(new Pawn(black, (6, 2)));
+		pieces.push(new Pawn(black, (6, 3)));
+		pieces.push(new Pawn(black, (6, 4)));
+		pieces.push(new Pawn(black, (6, 5)));
+		pieces.push(new Pawn(black, (6, 6)));
+		pieces.push(new Pawn(black, (6, 7)));
 
-    return pieces;
-  }
+		return pieces;
+	}
 
-  loadBoard() {
-    const board = [];
-    for (let i = 0; i < 8; i += 1) {
-      const row = [];
-      for (let j = 0; j < 8; j += 1) {
-        row.push(null);
-      }
-      board.push(row);
-    }
+	loadBoard(pieces) {
+		const board = [];
+		for (let i = 0; i < 8; i += 1) {
+			const row = [];
+			for (let j = 0; j < 8; j += 1) {
+				row.push(null);
+			}
+			board.push(row);
+		}
 
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      const piece = this.pieces[i];
-      const loc = piece.getPosition();
-      board[loc[0]][loc[1]] = piece;
-    }
+		for (let i = 0; i < pieces.length; i += 1) {
+			const piece = pieces[i];
+			const loc = piece.getPosition();
+			board[loc[0]][loc[1]] = piece;
+		}
 
-    return board;
-  }
+		return board;
+	}
 
-  isValidMove(piece, m) {
-    // Check that the move is valid and that it does not cause check
-    return piece.isActive() && piece.isValidMove(m, this) && !this.causesCheck(piece, m);
-  }
+	isValidMove(piece, m) {
+		// Check that the move is valid and that it does not cause check
+		return piece.isActive() && piece.isValidMove(m, this) && !this.causesCheck(piece, m);
+	}
 
-  causesCheck(piece, m) {
-    // Simulate the move and see if it places the player in check
-    const p = piece.getPosition();
-    const temp = this.board[m[0]][m[1]];
-    this.board[p[0]][p[1]] = null;
-    this.board[m[0]][m[1]] = piece;
-    const causesCheck = this.isCheck();
-    // Undo the move
-    this.board[p[0]][p[1]] = piece;
-    this.board[m[0]][m[1]] = temp;
+	causesCheck(piece, m) {
+		// Simulate the move and see if it places the player in check
+		const p = piece.getPosition();
+		const temp = this.board[m[0]][m[1]];
+		this.board[p[0]][p[1]] = null;
+		this.board[m[0]][m[1]] = piece;
+		const causesCheck = this.isCheck();
+		// Undo the move
+		this.board[p[0]][p[1]] = piece;
+		this.board[m[0]][m[1]] = temp;
 
-    return causesCheck;
-  }
+		return causesCheck;
+	}
 
-  filterMoves(piece) {
-    const finalMoves = [];
-    const moves = piece.getMoves();
-    for (let i = 0; i < moves.length; i += 1) {
-      const move = moves[i];
-      if (!(this.causesCheck(piece, move))) {
-        finalMoves.push(moves);
-      }
-    }
-    return finalMoves;
-  }
+	filterMoves(piece) {
+		const finalMoves = [];
+		const moves = piece.getMoves();
+		for (let i = 0; i < moves.length; i += 1) {
+			const move = moves[i];
+			if (!(this.causesCheck(piece, move))) {
+				finalMoves.push(moves);
+			}
+		}
+		return finalMoves;
+	}
 
-  applyMove(p, m) {
-    const piece = this.board[p[0]][p[1]];
-    if (piece === null) {
-      return;
-    }
-    if (!(this.isValidMove(piece, m))) {
-      return;
-    }
-    const pieceAtMove = this.board[m[0]][m[1]];
-    if (pieceAtMove !== null) {
-      pieceAtMove.setActive(false);
-    }
-    this.board[p[0]][p[1]] = null;
-    this.board[m[0]][m[1]] = piece;
-    piece.setPosition(m);
-    // Verify en Passant if it occurs
-    this.enPassant();
-    this.turn = this.getOpponent();
-  }
+	applyMove(p, m) {
 
-  enPassant() {
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      const piece = this.pieces[i];
-      const row = piece.getPosition()[0];
-      const col = piece.getPosition()[1];
-      const opponent = this.getOpponent();
-      // Find an opponent's piece in en passant, if it exists
-      if (piece.getColor() === opponent
-      && piece instanceof Pawn
-      && piece.isActive()
-      && piece.isEnPassant()) {
-        // Disable it since the turn is over
-        piece.disableEnPassant();
-        let captureSpot = null;
-        if (piece.getColor() === white) {
-          captureSpot = this.board[row - 1][col];
-        } else {
-          captureSpot = this.board[row + 1][col];
-        }
-        // Check if the player put a pawn in capture spot
-        if (captureSpot !== null
-          && captureSpot.getColor() === this.turn
-          && captureSpot instanceof Pawn) {
-          // Remove the piece if player just captured
-          this.board[row][col] = null;
-          piece.setActive(false);
-        }
-        break; // Only one piece may be en passant at a time.
-      }
-    }
-  }
+		const piece = this.board[p[0]][p[1]];
+		if (piece === null) {
+			return;
+		}
+		if (!(this.isValidMove(piece, m))) {
+			return;
+		}
+		const fromLoc = m.getFrom();
+		const pieceAtMove = this.board[fromLoc[0]][fromLoc[1]];
+		if (pieceAtMove !== null) {
+			pieceAtMove.setActive(false);
+		}
+		this.board[p[0]][p[1]] = null;
+		this.board[m[0]][m[1]] = piece;
+		piece.setPosition(m);
+		// Verify en Passant if it occurs
+		this.enPassant();
+		this.turn = this.getOpponent();
+	}
 
-  isPromotion() {
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      const piece = this.pieces[i];
-      const row = piece.getPosition()[0];
-      const color = piece.getColor();
-      if (piece instanceof Pawn
-        && (row === 0 || row === 7)) {
-        return true;
-      }
-    }
-    return false;
-  }
+	getPieces() {
+		const pieces = [];
+		for (let i = 0; i < this.board.length; i += 1) {
+			for (let j = 0; j < this.board[i].length; j += 1) {
+				const piece = this.board[i][j];
+				if (piece !== null) {
+					pieces.push(piece);
+				}
+			}
+		}
+		return pieces;
+	}
 
-  isCheck() {
-    let kingPos = null;
+	enPassant() {
+		pieces = this.getPieces();
+		for (let i = 0; i < pieces; i += 1) {
+			const piece = pieces[i];
+			const row = piece.getPosition()[0];
+			const col = piece.getPosition()[1];
+			const opponent = this.getOpponent();
+			// Find an opponent's piece in en passant, if it exists
+			if (piece.getColor() === opponent
+				&& piece instanceof Pawn
+				&& piece.isActive()
+				&& piece.isEnPassant()) {
+				// Disable it since the turn is over
+				piece.disableEnPassant();
+				let captureSpot = null;
+				if (piece.getColor() === white) {
+					captureSpot = this.board[row - 1][col];
+				} else {
+					captureSpot = this.board[row + 1][col];
+				}
+				// Check if the player put a pawn in capture spot
+				if (captureSpot !== null
+					&& captureSpot.getColor() === this.turn
+					&& captureSpot instanceof Pawn) {
+					// Remove the piece if player just captured
+					this.board[row][col] = null;
+					piece.setActive(false);
+				}
+				break; // Only one piece may be en passant at a time.
+			}
+		}
+	}
 
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      const piece = this.pieces[i];
-      if (piece.getColor() === this.turn
-      && piece instanceof King
-      && piece.isActive()) {
-        kingPos = piece.getPosition();
-        break;
-      }
-    }
+	isPromotion() {
+		pieces = this.getPieces();
+		for (let i = 0; i < pieces.length; i += 1) {
+			const piece = pieces[i];
+			const row = piece.getPosition()[0];
+			const color = piece.getColor();
+			if (piece instanceof Pawn && piece.canPromote()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    if (kingPos === null) {
-      return true;
-    }
+	isCheck() {
+		let kingPos = null;
+		const pieces = this.getPieces();
+		for (let i = 0; i < pieces.length; i += 1) {
+			const piece = pieces[i];
+			if (piece.getColor() === this.turn
+				&& piece instanceof King
+				&& piece.isActive()) {
+				kingPos = piece.getPosition();
+				break;
+			}
+		}
 
-    const opponent = this.getOpponent();
+		if (kingPos === null) {
+			return true;
+		}
 
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      const piece = this.pieces[i];
-      if (piece.getColor() === opponent
-      && piece.isActive()
-      && piece.getMoves(this).contains(kingPos)) {
-        return true;
-      }
-    }
+		const opponent = this.getOpponent();
 
-    return false;
-  }
+		for (let i = 0; i < pieces.length; i += 1) {
+			const piece = pieces[i];
+			if (piece.getColor() === opponent
+				&& piece.isActive()
+				&& piece.getMoves(this).contains(kingPos)) {
+				return true;
+			}
+		}
 
-  isCheckmate() {
-    // 1. If board.isCheck() is false, return false
-    if (!(this.isCheck())) {
-      return false;
-    }
-    // 2. Loop over all pieces
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      // 3. If piece.getColor() == this.turn
-      const piece = this.pieces[i];
-      if (piece.getColor() === this.turn
-      && piece.isActive()) {
-        // 4. Generate all moves for the piece
-        // Filter moves out which maintain check
-        const moves = this.filterMoves(piece);
-        // A move exists which gets out of check
-        if (moves.length > 0) {
-          return false;
-        }
-      }
-    }
-    // 8. Return true
-    return true;
-  }
+		return false;
+	}
 
-  isStalemate() {
-    if (this.isCheck()) {
-      return false;
-    }
+	isCheckmate() {
+		// 1. If board.isCheck() is false, return false
+		if (!(this.isCheck())) {
+			return false;
+		}
+		// 2. Loop over all pieces
+		pieces = this.getPieces();
+		for (let i = 0; i < pieces.length; i += 1) {
+			// 3. If piece.getColor() == this.turn
+			const piece = pieces[i];
+			if (piece.getColor() === this.turn
+				&& piece.isActive()) {
+				// 4. Generate all moves for the piece
+				// Filter moves out which maintain check
+				const moves = this.filterMoves(piece);
+				// A move exists which gets out of check
+				if (moves.length > 0) {
+					return false;
+				}
+			}
+		}
+		// 8. Return true
+		return true;
+	}
 
-    for (let i = 0; i < this.pieces.length; i += 1) {
-      const piece = this.pieces[i];
-      if (piece.getColor() === this.turn
-      && piece.isActive()) {
-        const moves = this.filterMoves(piece);
-        // A move exists.
-        if (moves.length > 0) {
-          return false;
-        }
-      }
-    }
+	isStalemate() {
+		if (this.isCheck()) {
+			return false;
+		}
 
-    return true;
-  }
+		const pieces = this.getPieces();
+		for (let i = 0; i < pieces.length; i += 1) {
+			const piece = pieces[i];
+			if (piece.getColor() === this.turn
+				&& piece.isActive()) {
+				const moves = this.filterMoves(piece);
+				// A move exists.
+				if (moves.length > 0) {
+					return false;
+				}
+			}
+		}
 
-  // TODO
-  // add conditions for castling
-  // add history
-  // check promotion and en passant ONLY after a pawn move 
-  // implement promotion
+		return true;
+	}
+
+	isOccupied(row, col) {
+		return this.board[row][col] !== null;
+	}
+
+	isInBounds(move) {
+		const to = move.getTo();
+		const from = move.getFrom();
+		return (to[0] >= 0 && to[0] < 8
+			&& to[1] >= 0 && to[1] < 8
+			&& from[0] >= 0 && from[0] < 8
+			&& from[1] >= 0 && from[1] < 8);
+	}
+
+	// TODO
+	// add conditions for castling
+	// add history
+	// check promotion and en passant ONLY after a pawn move
+	// implement promotion
 }
 
 module.exports = Board;

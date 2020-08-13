@@ -1,42 +1,48 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 class Piece {
-  constructor(c, p) {
-    this.color = c;
-    this.position = p;
-    this.active = true;
-  }
+	constructor(c, p) {
+		this.color = c;
+		this.position = p;
+		this.active = true;
+		this.hasMoved = false;
+	}
 
-  isActive() {
-    return this.active;
-  }
+	isActive() {
+		return this.active;
+	}
 
-  setActive(a) {
-    this.active = a;
-  }
+	setActive(a) {
+		this.active = a;
+	}
 
-  getColor() {
-    return this.color;
-  }
+	getColor() {
+		return this.color;
+	}
 
-  getPosition() {
-    return this.position;
-  }
+	getPosition() {
+		return this.position;
+	}
 
-  setPosition(p) {
-    this.position = p;
-  }
+	setPosition(p) {
+		this.position = p;
+		this.hasMoved = true;
+	}
 
-  getMoves(b) {
-    if (new.target === Piece) {
-      throw new TypeError('Need to implement getMoves method');
-    }
-  }
+	getMoves(b) {
+		if (new.target === Piece) {
+			throw new TypeError('Need to implement getMoves method');
+		}
+	}
 
-  isValidMove(m, b) {
-    const moves = this.getMoves(b);
-    return moves.includes(m);
-  }
+	isValidMove(m, b) {
+		const moves = this.getMoves(b);
+		return moves.includes(m);
+	}
+
+	hasMoved() {
+		return this.hasMoved;
+	}
 }
 
 module.exports = Piece;
