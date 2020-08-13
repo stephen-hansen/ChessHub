@@ -13,9 +13,7 @@ input {
 body{
     font-family: "Candara";
     font-size: 30px;
-    /* background-color: #FFC600; */
-    /* background-color: #B1E4B9; */
-    background-color: #ffffff;
+    background-color: #c4ced4;
     color: #333333;
     text-align: center;
 }
@@ -40,7 +38,7 @@ button{
 
 .square {
   background: transparent;
-  border: 2px solid transparent;
+  border: 0px solid transparent;
   /* float: center; */
   float: center;
   font-size: 24px;
@@ -55,6 +53,7 @@ button{
   height: 60px;
 }
 
+/* theme coral from http://omgchess.blogspot.com/2015/09/ */
 .dark-square {
   background-color: #70a2a3;
 }
@@ -62,42 +61,3 @@ button{
 .light-square {
   background-color: #B1E4B9;;
 }
-
-/* .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-} */
