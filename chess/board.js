@@ -16,6 +16,18 @@ class Board {
 		this.history = [];
 	}
 
+	getBoard() {
+		return this.board;
+	}
+
+	getPiece(loc) {
+		return this.board[loc[0]][loc[1]];
+	}
+
+	setPiece(loc, piece) {
+		this.board[loc[0]][loc[1]] = piece;
+	}
+
 	getOpponent() {
 		if (this.turn === white) {
 			return black;
@@ -76,27 +88,28 @@ class Board {
 		for (let i = 0; i < pieces.length; i += 1) {
 			const piece = pieces[i];
 			const loc = piece.getPosition();
-			board[loc[0]][loc[1]] = piece;
+			board.setPiece(loc,piece);
 		}
 
 		return board;
 	}
 
-	isValidMove(piece, m) {
+	isValidMove(piece, move) {
 		// Check that the move is valid and that it does not cause check
-		return piece.isActive() && piece.isValidMove(m, this) && !this.causesCheck(piece, m);
+		return piece.isActive() && piece.isValidMove(move, this) && !this.causesCheck(piece, move);
 	}
 
-	causesCheck(piece, m) {
+	causesCheck(piece, move) {
 		// Simulate the move and see if it places the player in check
 		const p = piece.getPosition();
-		const temp = this.board[m[0]][m[1]];
-		this.board[p[0]][p[1]] = null;
-		this.board[m[0]][m[1]] = piece;
+		const to = move.getTo();
+		const temp = this.getPiece(to);
+		this.setPiece(p,null);
+		this.setPiece(to,piece);
 		const causesCheck = this.isCheck();
 		// Undo the move
-		this.board[p[0]][p[1]] = piece;
-		this.board[m[0]][m[1]] = temp;
+		this.setPiece(p,piece);
+		this.setPiece(to,temp);
 
 		return causesCheck;
 	}
@@ -113,33 +126,35 @@ class Board {
 		return finalMoves;
 	}
 
-	applyMove(p, m) {
-
-		const piece = this.board[p[0]][p[1]];
+	applyMove(move) {
+		const toLoc = move.getTo();
+		const fromLoc = move.getFrom();
+		const piece = this.getPiece(fromLoc);
 		if (piece === null) {
-			return;
+			return false;
 		}
-		if (!(this.isValidMove(piece, m))) {
-			return;
+		if (!(this.isValidMove(piece, move))) {
+			return false;
 		}
-		const fromLoc = m.getFrom();
-		const pieceAtMove = this.board[fromLoc[0]][fromLoc[1]];
+		const pieceAtMove = this.getPiece(toLoc);
 		if (pieceAtMove !== null) {
 			pieceAtMove.setActive(false);
 		}
-		this.board[p[0]][p[1]] = null;
-		this.board[m[0]][m[1]] = piece;
-		piece.setPosition(m);
+		this.setPiece(fromLoc,null);
+		this.setPiece(toLoc,piece);
+		piece.setPosition(toLoc);
+		this.history.push(move);
 		// Verify en Passant if it occurs
 		this.enPassant();
 		this.turn = this.getOpponent();
+		return true;
 	}
 
 	getPieces() {
 		const pieces = [];
 		for (let i = 0; i < this.board.length; i += 1) {
 			for (let j = 0; j < this.board[i].length; j += 1) {
-				const piece = this.board[i][j];
+				const piece = this.getPiece((i,j));
 				if (piece !== null) {
 					pieces.push(piece);
 				}
@@ -152,8 +167,9 @@ class Board {
 		pieces = this.getPieces();
 		for (let i = 0; i < pieces; i += 1) {
 			const piece = pieces[i];
-			const row = piece.getPosition()[0];
-			const col = piece.getPosition()[1];
+			const pos = piece.getPosition();
+			const row = pos[0];
+			const col = pos[1];
 			const opponent = this.getOpponent();
 			// Find an opponent's piece in en passant, if it exists
 			if (piece.getColor() === opponent
@@ -164,16 +180,16 @@ class Board {
 				piece.disableEnPassant();
 				let captureSpot = null;
 				if (piece.getColor() === white) {
-					captureSpot = this.board[row - 1][col];
+					captureSpot = this.getPiece((row-1,col));
 				} else {
-					captureSpot = this.board[row + 1][col];
+					captureSpot = this.getPiece((row+1,col));
 				}
 				// Check if the player put a pawn in capture spot
 				if (captureSpot !== null
 					&& captureSpot.getColor() === this.turn
 					&& captureSpot instanceof Pawn) {
 					// Remove the piece if player just captured
-					this.board[row][col] = null;
+					this.setPiece(pos, null);
 					piece.setActive(false);
 				}
 				break; // Only one piece may be en passant at a time.
@@ -185,8 +201,6 @@ class Board {
 		pieces = this.getPieces();
 		for (let i = 0; i < pieces.length; i += 1) {
 			const piece = pieces[i];
-			const row = piece.getPosition()[0];
-			const color = piece.getColor();
 			if (piece instanceof Pawn && piece.canPromote()) {
 				return true;
 			}
@@ -272,7 +286,7 @@ class Board {
 	}
 
 	isOccupied(row, col) {
-		return this.board[row][col] !== null;
+		return this.getPiece((row,col)) !== null;
 	}
 
 	isInBounds(move) {
@@ -286,7 +300,7 @@ class Board {
 
 	// TODO
 	// add conditions for castling
-	// add history
+	// add undo
 	// check promotion and en passant ONLY after a pawn move
 	// implement promotion
 }

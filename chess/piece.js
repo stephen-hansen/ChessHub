@@ -1,5 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
+
+const { Move } = require('./move.js');
+
 class Piece {
 	constructor(c, p) {
 		this.color = c;
@@ -29,20 +32,63 @@ class Piece {
 		this.hasMoved = true;
 	}
 
-	getMoves(b) {
+	getMoves(board) {
 		if (new.target === Piece) {
 			throw new TypeError('Need to implement getMoves method');
 		}
 	}
 
-	isValidMove(m, b) {
-		const moves = this.getMoves(b);
-		return moves.includes(m);
+	isValidMove(move, bboard) {
+		const moves = this.getMoves(board);
+		return moves.includes(move);
 	}
 
 	hasMoved() {
 		return this.hasMoved;
 	}
+
+	getMovesInDirection(board, down, right) {
+		const moves = [];
+		const row = this.getPosition()[0];
+		const col = this.getPosition()[1];
+		for (let i = row + down, j = col + right, move = new Move((row,col),(i,j)); b.isInBounds(move); i += down, j += right) {
+			const pieceAtMove = b.getPiece(move.getTo());
+			if (pieceAtMove === null) {
+				moves.push(move);
+			} else {
+				if (pieceAtMove.getColor() !== this.getColor()) {
+					moves.push(move);
+				}
+				break;
+			}
+		}
+		return moves;
+	}
+
+	getMovesRelative(b, offsets) {
+		const moves = [];
+		const pos = this.getPosition();
+		const row = pos[0];
+		const col = pos[1];
+		const possibleMovesTos = [];
+
+		for (let i = 0; i < offsets.length; i += 1) {
+			possibleMoveTos.push((offsets[i][0] + row, offsets[i][1] + col));
+		}
+
+		for (let i = 0; i < possibleMoveTos.length; i += 1) {
+			const move = new Move(pos, possibleMoveTos[i]);
+			if (b.isInBounds(move)) {
+				pieceAtLoc = b.getPiece(move.getTo());
+				if (pieceAtLoc === null || pieceAtLoc.getColor() !== this.getColor()) {
+					moves.push(move);
+				}
+			}
+		}
+
+		return moves;
+	}
+
 }
 
 module.exports = Piece;

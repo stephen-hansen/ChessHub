@@ -1,33 +1,20 @@
 const { Piece } = require('./piece.js');
+const { Move } = require('./move.js');
 
 class King extends Piece {
 	getMoves(b) {
-		const moves = [];
-		const row = this.getPosition()[0];
-		const col = this.getPosition()[1];
-		const possibleMoves = [
-			(row + 1, col - 1),
-			(row + 1, col),
-			(row + 1, col + 1),
-			(row, col + 1),
-			(row - 1, col + 1),
-			(row - 1, col),
-			(row - 1, col - 1),
-			(row, col - 1),
+		const relatives = [
+			( 1, -1),
+			( 1,  0),
+			( 1,  1),
+			( 0,  1),
+			(-1,  1),
+			(-1,  0),
+			(-1, -1),
+			( 0, -1),
 		];
 
-		for (let i = 0; i < possibleMoves.length; i += 1) {
-			const move = possibleMoves[i];
-			const r = move[0];
-			const c = move[1];
-			if (r >= 0 && r < 8 && c >= 0 && c < 8) {
-				if (b[r][c] === null || b[r][c].getColor() !== this.getColor()) {
-					moves.push(move);
-				}
-			}
-		}
-
-		return moves;
+		return this.getMovesRelative(b, relatives);
 	}
 }
 
