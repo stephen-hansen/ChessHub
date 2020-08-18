@@ -8,12 +8,12 @@ const left = 'left';
 const right = 'right';
 
 module.exports = {
-	white,
-	black,
-	queen,
-	rook,
-	knight,
-	bishop,
-	left,
-	right,
+  white,
+  black,
+  queen,
+  rook,
+  knight,
+  bishop,
+  left,
+  right,
 };

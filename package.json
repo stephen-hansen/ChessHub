@@ -1,4 +1,5 @@
 {
+  "root": true,
   "name": "SE-181-Team-Project",
   "version": "1.0.0",
   "description": "Helpful https://socket.io/docs/emit-cheatsheet/",

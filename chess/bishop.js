@@ -1,23 +1,22 @@
 const { Piece } = require('./piece.js');
-const { Move } = require('./move.js');
 
 class Bishop extends Piece {
-	getMoves(b) {
-		const moves = [];
-		// Up-Right Diag
-		moves.concat(this.getMovesInDirection(b,-1,1));
+  getMoves(b) {
+    const moves = [];
+    // Up-Right Diag
+    moves.concat(this.getMovesInDirection(b, -1, 1));
 
-		// Up-Left Diag
-		moves.concat(this.getMovesInDirection(b,-1,-1));
+    // Up-Left Diag
+    moves.concat(this.getMovesInDirection(b, -1, -1));
 
-		// Down-Right Diag
-		moves.concat(this.getMovesInDirection(b,1,1));
+    // Down-Right Diag
+    moves.concat(this.getMovesInDirection(b, 1, 1));
 
-		// Down-Left Diag
-		moves.concat(this.getMovesInDirection(b,1,-1));
+    // Down-Left Diag
+    moves.concat(this.getMovesInDirection(b, 1, -1));
 
-		return moves;
-	}
+    return moves;
+  }
 }
 
 module.exports = { Bishop };
