@@ -4,8 +4,7 @@
   "description": "Helpful https://socket.io/docs/emit-cheatsheet/",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
-    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
+    "test": "jest --coverage && coveralls < coverage/lcov.info",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
