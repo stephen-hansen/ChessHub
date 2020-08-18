@@ -2,18 +2,18 @@ const { Piece } = require('./piece.js');
 
 class Rook extends Piece {
   getMoves(b) {
-    const moves = [];
+    let moves = [];
     // Up Vertical
-    moves.concat(this.getMovesInDirection(b, -1, 0));
+    moves = moves.concat(this.getMovesInDirection(b, -1, 0));
 
     // Left Horizontal
-    moves.concat(this.getMovesInDirection(b, 0, -1));
+    moves = moves.concat(this.getMovesInDirection(b, 0, -1));
 
     // Down Vertical
-    moves.concat(this.getMovesInDirection(b, 1, 0));
+    moves = moves.concat(this.getMovesInDirection(b, 1, 0));
 
     // Right Horizontal
-    moves.concat(this.getMovesInDirection(b, 0, 1));
+    moves = moves.concat(this.getMovesInDirection(b, 0, 1));
 
     return moves;
   }

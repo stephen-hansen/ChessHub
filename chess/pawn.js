@@ -41,7 +41,7 @@ class Pawn extends Piece {
 
     // Handle moving up/down and double for first move
     const moveUp = new Move(this.getPosition(), [row + direction, col]);
-    if (b.inBounds(moveUp) && !b.isOccupied(row + direction, col)) {
+    if (b.isInBounds(moveUp) && !b.isOccupied(row + direction, col)) {
       moves.push(moveUp);
       if (!b.isOccupied(row + direction * 2, col)
         && !this.hasMoved()) {
@@ -52,11 +52,12 @@ class Pawn extends Piece {
     // TODO really need to rewrite this
 
     // Handle capture left
-    if (b.inBounds(row + direction, col - 1)) {
+    const moveLeft = new Move(this.getPosition(), [row + direction, col - 1]);
+    if (b.isInBounds(moveLeft)) {
       const capture = b.getPiece([row + direction, col - 1]);
       if (capture !== null
         && capture.getColor() !== this.getColor()) {
-        moves.push(new Move(this.getPosition(), [row + direction, col - 1]));
+        moves.push(moveLeft);
       } else if (capture === null) {
         // En passant criteria
         const enPassantCapture = b.getPiece([row, col - 1]);
@@ -70,11 +71,12 @@ class Pawn extends Piece {
     }
 
     // Handle capture right
-    if (b.inBounds(row + direction, col + 1)) {
+    const moveRight = new Move(this.getPosition(), [row + direction, col + 1]);
+    if (b.isInBounds(moveRight)) {
       const capture = b.getPiece([row + direction, col + 1]);
       if (capture !== null
         && capture.getColor() !== this.getColor()) {
-        moves.push(new Move(this.getPosition(), [row + direction, col + 1]));
+        moves.push(moveRight);
       } else if (capture === null) {
         // En passant criteria
         const enPassantCapture = b.getPiece([row, col + 1]);

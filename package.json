@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --coverage && coveralls < coverage/lcov.info",
+    "coverage": "jest --coverage",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },

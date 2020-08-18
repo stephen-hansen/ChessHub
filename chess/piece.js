@@ -8,7 +8,7 @@ class Piece {
     this.color = c;
     this.position = p;
     this.active = true;
-    this.hasMoved = false;
+    this.moved = false;
   }
 
   isActive() {
@@ -29,7 +29,7 @@ class Piece {
 
   setPosition(p) {
     this.position = p;
-    this.hasMoved = true;
+    this.moved = true;
   }
 
   getMoves(board) {
@@ -40,19 +40,28 @@ class Piece {
 
   isValidMove(move, board) {
     const moves = this.getMoves(board);
-    return moves.includes(move);
+    for (let i = 0; i < moves.length; i += 1) {
+      if (moves[i].equals(move)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   hasMoved() {
-    return this.hasMoved;
+    return this.moved;
   }
 
   getMovesInDirection(board, down, right) {
     const moves = [];
     const row = this.getPosition()[0];
     const col = this.getPosition()[1];
-    for (let i = row + down, j = col + right, move = new Move([row, col], [i, j]);
-      board.isInBounds(move); i += down, j += right) {
+    let i = row + down;
+    let j = col + right;
+    let move = new Move([row, col], [i, j]);
+    while (board.isInBounds(move)) {
+      i += down;
+      j += right;
       const pieceAtMove = board.getPiece(move.getTo());
       if (pieceAtMove === null) {
         moves.push(move);
@@ -62,6 +71,7 @@ class Piece {
         }
         break;
       }
+      move = new Move([row, col], [i, j]);
     }
     return moves;
   }

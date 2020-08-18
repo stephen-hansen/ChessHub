@@ -14,6 +14,10 @@ class Board {
     this.history = [];
   }
 
+  setBoard(pieces) {
+    this.board = this.loadBoard(pieces);
+  }
+
   getBoard() {
     return this.board;
   }
@@ -139,8 +143,8 @@ class Board {
     if (pieceAtMove !== null) {
       pieceAtMove.setActive(false);
     }
-    this.setPiece(fromLoc, null);
     this.setPiece(toLoc, piece);
+    this.setPiece(fromLoc, null);
     piece.setPosition(toLoc);
     this.history.push(move);
     // Verify en Passant if it occurs
@@ -229,9 +233,14 @@ class Board {
     for (let i = 0; i < pieces.length; i += 1) {
       const piece = pieces[i];
       if (piece.getColor() === opponent
-        && piece.isActive()
-        && piece.getMoves(this).contains(kingPos)) {
-        return true;
+        && piece.isActive()) {
+        const moves = piece.getMoves(this);
+        for (let j = 0; j < moves.length; j += 1) {
+          const to = moves[j].getTo();
+          if (to[0] === kingPos[0] && to[1] === kingPos[1]) {
+            return true;
+          }
+        }
       }
     }
 
