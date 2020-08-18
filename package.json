@@ -1,12 +1,11 @@
 {
-  "root": true,
   "name": "SE-181-Team-Project",
   "version": "1.0.0",
   "description": "Helpful https://socket.io/docs/emit-cheatsheet/",
   "main": "server.js",
   "scripts": {
     "test": "jest",
-	"coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
+    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -31,7 +30,16 @@
     "eslint": "^7.4.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
     "jest": "^26.4.0",
     "nodemon": "^2.0.4"
+  },
+  "eslintConfig": {
+	  "plugins": ["jest"],
+	  "env": {
+      "jest/globals": true
+	  },
+    "extends": ["plugin:jest/recommended","airbnb-base"],
+    "root": true
   }
 }
