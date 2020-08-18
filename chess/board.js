@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 const { black, white } = require('./constants.js');
 const { Bishop } = require('./bishop.js');
@@ -7,7 +6,6 @@ const { Knight } = require('./knight.js');
 const { Pawn } = require('./pawn.js');
 const { Queen } = require('./queen.js');
 const { Rook } = require('./rook.js');
-const { Move } = require('./move.js');
 
 class Board {
   constructor() {

@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.1.0",
-    "eslint": "^7.4.0",
+    "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^23.20.0",
@@ -34,11 +34,23 @@
     "nodemon": "^2.0.4"
   },
   "eslintConfig": {
-	  "plugins": ["jest"],
-	  "env": {
-      "jest/globals": true
-	  },
-    "extends": ["plugin:jest/recommended","airbnb-base"],
+    "plugins": [
+      "jest"
+    ],
+    "env": {
+      "browser": true,
+      "node": true,
+      "jest/globals": true,
+      "es2020": true
+    },
+    "extends": [
+      "plugin:jest/recommended",
+      "airbnb-base"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 11,
+      "sourceType": "module"
+    },
     "root": true
   }
 }
