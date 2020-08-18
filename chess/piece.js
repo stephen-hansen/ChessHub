@@ -51,7 +51,7 @@ class Piece {
     const moves = [];
     const row = this.getPosition()[0];
     const col = this.getPosition()[1];
-    for (let i = row + down, j = col + right, move = new Move((row, col), (i, j));
+    for (let i = row + down, j = col + right, move = new Move([row, col], [i, j]);
       board.isInBounds(move); i += down, j += right) {
       const pieceAtMove = board.getPiece(move.getTo());
       if (pieceAtMove === null) {
@@ -74,7 +74,7 @@ class Piece {
     const possibleMoveTos = [];
 
     for (let i = 0; i < offsets.length; i += 1) {
-      possibleMoveTos.push((offsets[i][0] + row, offsets[i][1] + col));
+      possibleMoveTos.push([offsets[i][0] + row, offsets[i][1] + col]);
     }
 
     for (let i = 0; i < possibleMoveTos.length; i += 1) {
@@ -91,4 +91,4 @@ class Piece {
   }
 }
 
-module.exports = Piece;
+module.exports = { Piece };

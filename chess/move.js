@@ -19,4 +19,4 @@ class Move {
   }
 }
 
-module.exports = Move;
+module.exports = { Move };

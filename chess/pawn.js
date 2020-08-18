@@ -40,47 +40,49 @@ class Pawn extends Piece {
     const direction = (this.getColor() === white) ? -1 : 1;
 
     // Handle moving up/down and double for first move
-    const moveUp = new Move(this.getPosition(), (row + direction, col));
+    const moveUp = new Move(this.getPosition(), [row + direction, col]);
     if (b.inBounds(moveUp) && !b.isOccupied(row + direction, col)) {
-      moves.push((row + direction, col));
+      moves.push(moveUp);
       if (!b.isOccupied(row + direction * 2, col)
         && !this.hasMoved()) {
-        moves.push((row + direction * 2, col));
+        moves.push(new Move(this.getPosition(), [row + direction * 2, col]));
       }
     }
 
+    // TODO really need to rewrite this
+
     // Handle capture left
     if (b.inBounds(row + direction, col - 1)) {
-      const capture = b.getPiece((row + direction, col - 1));
+      const capture = b.getPiece([row + direction, col - 1]);
       if (capture !== null
         && capture.getColor() !== this.getColor()) {
-        moves.push((row + direction, col - 1));
+        moves.push(new Move(this.getPosition(), [row + direction, col - 1]));
       } else if (capture === null) {
         // En passant criteria
-        const enPassantCapture = b.getPiece((row, col - 1));
+        const enPassantCapture = b.getPiece([row, col - 1]);
         if (enPassantCapture !== null
           && enPassantCapture.getColor() !== this.getColor()
           && enPassantCapture instanceof Pawn
           && enPassantCapture.isEnPassant()) {
-          moves.push((row + direction, col - 1));
+          moves.push(new Move(this.getPosition(), [row + direction, col - 1]));
         }
       }
     }
 
     // Handle capture right
     if (b.inBounds(row + direction, col + 1)) {
-      const capture = b.getPiece((row + direction, col + 1));
+      const capture = b.getPiece([row + direction, col + 1]);
       if (capture !== null
         && capture.getColor() !== this.getColor()) {
-        moves.push((row + direction, col + 1));
+        moves.push(new Move(this.getPosition(), [row + direction, col + 1]));
       } else if (capture === null) {
         // En passant criteria
-        const enPassantCapture = b.getPiece((row, col + 1));
+        const enPassantCapture = b.getPiece([row, col + 1]);
         if (enPassantCapture !== null
           && enPassantCapture.getColor() !== this.getColor()
           && enPassantCapture instanceof Pawn
           && enPassantCapture.isEnPassant()) {
-          moves.push((row + direction, col + 1));
+          moves.push(new Move(this.getPosition(), [row + direction, col + 1]));
         }
       }
     }

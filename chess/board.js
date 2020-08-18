@@ -38,39 +38,39 @@ class Board {
   createPieces() {
     const pieces = [];
 
-    pieces.push(new Rook(white, (7, 0)));
-    pieces.push(new Knight(white, (7, 1)));
-    pieces.push(new Bishop(white, (7, 2)));
-    pieces.push(new Queen(white, (7, 3)));
-    pieces.push(new King(white, (7, 4)));
-    pieces.push(new Bishop(white, (7, 5)));
-    pieces.push(new Knight(white, (7, 6)));
-    pieces.push(new Rook(white, (7, 7)));
-    pieces.push(new Pawn(white, (6, 0)));
-    pieces.push(new Pawn(white, (6, 1)));
-    pieces.push(new Pawn(white, (6, 2)));
-    pieces.push(new Pawn(white, (6, 3)));
-    pieces.push(new Pawn(white, (6, 4)));
-    pieces.push(new Pawn(white, (6, 5)));
-    pieces.push(new Pawn(white, (6, 6)));
-    pieces.push(new Pawn(white, (6, 7)));
+    pieces.push(new Rook(white, [7, 0]));
+    pieces.push(new Knight(white, [7, 1]));
+    pieces.push(new Bishop(white, [7, 2]));
+    pieces.push(new Queen(white, [7, 3]));
+    pieces.push(new King(white, [7, 4]));
+    pieces.push(new Bishop(white, [7, 5]));
+    pieces.push(new Knight(white, [7, 6]));
+    pieces.push(new Rook(white, [7, 7]));
+    pieces.push(new Pawn(white, [6, 0]));
+    pieces.push(new Pawn(white, [6, 1]));
+    pieces.push(new Pawn(white, [6, 2]));
+    pieces.push(new Pawn(white, [6, 3]));
+    pieces.push(new Pawn(white, [6, 4]));
+    pieces.push(new Pawn(white, [6, 5]));
+    pieces.push(new Pawn(white, [6, 6]));
+    pieces.push(new Pawn(white, [6, 7]));
 
-    pieces.push(new Rook(black, (0, 0)));
-    pieces.push(new Knight(black, (0, 1)));
-    pieces.push(new Bishop(black, (0, 2)));
-    pieces.push(new Queen(black, (0, 3)));
-    pieces.push(new King(black, (0, 4)));
-    pieces.push(new Bishop(black, (0, 5)));
-    pieces.push(new Knight(black, (0, 6)));
-    pieces.push(new Rook(black, (0, 7)));
-    pieces.push(new Pawn(black, (1, 0)));
-    pieces.push(new Pawn(black, (1, 1)));
-    pieces.push(new Pawn(black, (1, 2)));
-    pieces.push(new Pawn(black, (1, 3)));
-    pieces.push(new Pawn(black, (1, 4)));
-    pieces.push(new Pawn(black, (1, 5)));
-    pieces.push(new Pawn(black, (1, 6)));
-    pieces.push(new Pawn(black, (1, 7)));
+    pieces.push(new Rook(black, [0, 0]));
+    pieces.push(new Knight(black, [0, 1]));
+    pieces.push(new Bishop(black, [0, 2]));
+    pieces.push(new Queen(black, [0, 3]));
+    pieces.push(new King(black, [0, 4]));
+    pieces.push(new Bishop(black, [0, 5]));
+    pieces.push(new Knight(black, [0, 6]));
+    pieces.push(new Rook(black, [0, 7]));
+    pieces.push(new Pawn(black, [1, 0]));
+    pieces.push(new Pawn(black, [1, 1]));
+    pieces.push(new Pawn(black, [1, 2]));
+    pieces.push(new Pawn(black, [1, 3]));
+    pieces.push(new Pawn(black, [1, 4]));
+    pieces.push(new Pawn(black, [1, 5]));
+    pieces.push(new Pawn(black, [1, 6]));
+    pieces.push(new Pawn(black, [1, 7]));
 
     return pieces;
   }
@@ -88,7 +88,8 @@ class Board {
     for (let i = 0; i < pieces.length; i += 1) {
       const piece = pieces[i];
       const loc = piece.getPosition();
-      board.setPiece(loc, piece);
+      // Need to do this the first time
+      board[loc[0]][loc[1]] = piece;
     }
 
     return board;
@@ -154,7 +155,7 @@ class Board {
     const pieces = [];
     for (let i = 0; i < this.board.length; i += 1) {
       for (let j = 0; j < this.board[i].length; j += 1) {
-        const piece = this.getPiece((i, j));
+        const piece = this.getPiece([i, j]);
         if (piece !== null) {
           pieces.push(piece);
         }
@@ -180,9 +181,9 @@ class Board {
         piece.disableEnPassant();
         let captureSpot = null;
         if (piece.getColor() === white) {
-          captureSpot = this.getPiece((row - 1, col));
+          captureSpot = this.getPiece([row - 1, col]);
         } else {
-          captureSpot = this.getPiece((row + 1, col));
+          captureSpot = this.getPiece([row + 1, col]);
         }
         // Check if the player put a pawn in capture spot
         if (captureSpot !== null
@@ -286,7 +287,7 @@ class Board {
   }
 
   isOccupied(row, col) {
-    return this.getPiece((row, col)) !== null;
+    return this.getPiece([row, col]) !== null;
   }
 
   isInBounds(move) {
@@ -305,4 +306,4 @@ class Board {
   // implement promotion
 }
 
-module.exports = Board;
+module.exports = { Board };
