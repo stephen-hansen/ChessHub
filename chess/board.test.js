@@ -107,3 +107,140 @@ test('accepted pawn moves', () => {
     expect(capBoard.getPiece(from)).toBeNull();
   }
 });
+
+test('rejected pawn moves', () => {
+  const board = new Board();
+  let pawn = new Pawn(white, [5, 5]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), pawn]);
+  let illegalMoveTos = [[2, 5], [4, 4], [4, 6], [5, 6], [5, 4], [6, 5], [6, 4], [6, 6]];
+  // Testing some basic illegal white pawn moves
+  for (let i = 0; i < illegalMoveTos.length; i += 1) {
+    const move = new Move([5, 5], illegalMoveTos[i]);
+    expect(board.applyMove(move)).toBeFalsy();
+    expect(board.getPiece(illegalMoveTos[i])).toBeNull();
+    expect(board.getPiece([5, 5])).toBe(pawn);
+  }
+  pawn = new Pawn(black, [4, 4]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), pawn]);
+  illegalMoveTos = [[7, 4], [5, 3], [5, 5], [4, 3], [4, 5], [3, 4], [3, 3], [3, 5]];
+  // Testing some basic illegal black pawn moves
+  for (let i = 0; i < illegalMoveTos.length; i += 1) {
+    const move = new Move([4, 4], illegalMoveTos[i]);
+    expect(board.applyMove(move)).toBeFalsy();
+    expect(board.getPiece(illegalMoveTos[i])).toBeNull();
+    expect(board.getPiece([4, 4])).toBe(pawn);
+  }
+  pawn = new Pawn(white, [5, 5]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), pawn,
+    new Pawn(white, [4, 5]), new Pawn(white, [4, 4]), new Pawn(white, [4, 6])]);
+  illegalMoveTos = [[4, 5], [4, 4], [4, 6]];
+  // Now for illegal captures
+  for (let i = 0; i < illegalMoveTos.length; i += 1) {
+    const move = new Move([5, 5], illegalMoveTos[i]);
+    expect(board.applyMove(move)).toBeFalsy();
+    const piece = board.getPiece(illegalMoveTos[i]);
+    expect(piece.getColor()).toBe(white);
+    expect(piece.isActive()).toBeTruthy();
+    expect(piece).toBeInstanceOf(Pawn);
+    expect(board.getPiece([5, 5])).toBe(pawn);
+  }
+  // And for final rank
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]),
+    new Pawn(white, [0, 5]), new Pawn(black, [7, 5])]);
+  expect(board.applyMove(new Move([0, 5], [-1, 5]))).toBeFalsy();
+  expect(board.applyMove(new Move([7, 5], [8, 5]))).toBeFalsy();
+});
+
+test('accepted rook moves', () => {
+});
+
+test('rejected rook moves', () => {
+});
+
+test('accepted bishop moves', () => {
+});
+
+test('rejected bishop moves', () => {
+});
+
+test('accepted knight moves', () => {
+});
+
+test('rejected knight moves', () => {
+});
+
+test('accepted queen moves', () => {
+});
+
+test('rejected queen moves', () => {
+});
+
+test('accepted king moves', () => {
+});
+
+test('rejected king moves', () => {
+});
+
+test('detect check in move validation', () => {
+  let board = new Board();
+  board.setBoard([new King(white, [7, 5]),
+    new Rook(white, [6, 5]),
+    new Rook(black, [5, 5]),
+    new King(black, [4, 5])]);
+  // Do not allow moves that place player's king in check
+  expect(board.applyMove(new Move([6, 5], [6, 4]))).toBeFalsy();
+  board = new Board();
+  board.setBoard([new King(white, [7, 5]),
+    new Rook(black, [5, 5]),
+    new King(black, [4, 5])]);
+  // Force the king to move out of check
+  expect(board.applyMove(new Move([7, 5], [6, 5]))).toBeFalsy();
+  expect(board.applyMove(new Move([7, 5], [7, 4]))).toBeTruthy();
+});
+
+test('detect checkmate', () => {
+  const board = new Board();
+  expect(board.isCheckmate()).toBeFalsy();
+  // Fool's mate test
+  // Move pawns
+  expect(board.applyMove(new Move([6, 5], [5, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 4], [3, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([6, 6], [4, 6]))).toBeTruthy();
+  // Move black's queen into position
+  expect(board.applyMove(new Move([0, 3], [4, 7]))).toBeTruthy();
+  expect(board.isCheckmate()).toBeTruthy();
+  expect(board.isStalemate()).toBeFalsy();
+  // White is in check but not checkmate for next test
+  board.setBoard([new King(white, [7, 5]),
+    new Rook(black, [5, 5]),
+    new King(black, [4, 5])]);
+  expect(board.isCheckmate()).toBeFalsy();
+});
+
+test('detect stalemate', () => {
+  const board = new Board();
+  expect(board.isStalemate()).toBeFalsy();
+  // Stalemate test
+  board.setBoard([new King(white, [0, 7]),
+    new King(black, [1, 5]),
+    new Queen(black, [2, 6])]);
+  expect(board.isCheckmate()).toBeFalsy();
+  expect(board.isStalemate()).toBeTruthy();
+  // White is in check but not stalemate for next test
+  board.setBoard([new King(white, [7, 5]),
+    new Rook(black, [5, 5]),
+    new King(black, [4, 5])]);
+  expect(board.isStalemate()).toBeFalsy();
+});
+
+test('pawn promotion', () => {
+});
+
+test('initial pawn move', () => {
+});
+
+test('en passant capture', () => {
+});
+
+test('castle left/right', () => {
+});

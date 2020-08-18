@@ -109,8 +109,10 @@ class Board {
     const temp = this.getPiece(to);
     this.setPiece(p, null);
     this.setPiece(to, piece);
+    piece.setPosition(to);
     const causesCheck = this.isCheck();
     // Undo the move
+    piece.setPosition(p);
     this.setPiece(p, piece);
     this.setPiece(to, temp);
 
@@ -119,7 +121,7 @@ class Board {
 
   filterMoves(piece) {
     const finalMoves = [];
-    const moves = piece.getMoves();
+    const moves = piece.getMoves(this);
     for (let i = 0; i < moves.length; i += 1) {
       const move = moves[i];
       if (!(this.causesCheck(piece, move))) {
@@ -294,7 +296,7 @@ class Board {
   }
 
   isOccupied(row, col) {
-    return this.getPiece([row, col]) !== null;
+    return row >= 0 && row < 8 && col >= 0 && col < 8 && this.getPiece([row, col]) !== null;
   }
 
   isInBounds(move) {
