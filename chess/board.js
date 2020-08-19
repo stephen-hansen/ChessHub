@@ -131,6 +131,19 @@ class Board {
     return finalMoves;
   }
 
+  getValidMoves(loc) {
+    const piece = this.getPiece(loc);
+    if (piece === null) {
+      return [];
+    }
+    const moves = this.filterMoves(piece);
+    const moveTos = [];
+    for (let i = 0; i < moves.length; i += 1) {
+      moveTos.push(moves[i].getTo());
+    }
+    return moveTos;
+  }
+
   applyMove(move) {
     const toLoc = move.getTo();
     const fromLoc = move.getFrom();
