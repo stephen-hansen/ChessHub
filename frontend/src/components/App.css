@@ -59,5 +59,13 @@ button{
 }
 
 .light-square {
-  background-color: #B1E4B9;;
+  background-color: #B1E4B9;
+}
+
+.highlighted {
+  border: 1px solid yellow;
+} 
+
+.nun {
+  border: 1px solid black;
 }
