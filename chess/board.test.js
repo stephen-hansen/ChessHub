@@ -152,15 +152,117 @@ test('rejected pawn moves', () => {
 });
 
 test('accepted rook moves', () => {
+  const board = new Board();
+  const rook = new Rook(white, [5, 5]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), rook]);
+  let moveTos = [[4, 5], [4, 4], [5, 4], [5, 5]];
+  // Move once all four ways
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(rook.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(board.getPiece(moveTos[i])).toBe(rook);
+  }
+  rook.setPosition([7, 7]);
+  board.setBoard([new King(white, [3, 3]), new King(black, [5, 5]), rook]);
+  moveTos = [[0, 7], [0, 0], [7, 0], [7, 7]];
+  // Run the four corners
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(rook.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(board.getPiece(moveTos[i])).toBe(rook);
+  }
+  rook.setPosition([7, 7]);
+  const blackRook = new Rook(black, [0, 7]);
+  board.setBoard([new King(white, [3, 3]), new King(black, [5, 5]), rook, blackRook]);
+  // Capture rook
+  expect(board.applyMove(new Move(rook.getPosition(), blackRook.getPosition()))).toBeTruthy();
+  expect(blackRook.isActive()).toBeFalsy();
 });
 
 test('rejected rook moves', () => {
+  const board = new Board();
+  const rook = new Rook(white, [5, 5]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), rook]);
+  const moveTos = [[4, 4], [6, 6], [4, 6], [6, 4]];
+  // Move to diagonals
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(rook.getPosition(), moveTos[i]))).toBeFalsy();
+    expect(board.getPiece([5, 5])).toBe(rook);
+  }
+  // Capture white rook
+  const wRook = new Rook(white, [5, 6]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), rook, wRook]);
+  expect(board.applyMove(new Move(rook.getPosition(), wRook.getPosition()))).toBeFalsy();
+  expect(wRook.isActive()).toBeTruthy();
+  // Jump over black rook
+  const bRook = new Rook(black, [5, 6]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), rook, bRook]);
+  expect(board.applyMove(new Move(rook.getPosition(), [5, 7]))).toBeFalsy();
+  expect(bRook.isActive()).toBeTruthy();
+  // Out of bounds
+  rook.setPosition([7, 7]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), rook]);
+  expect(board.applyMove(new Move(rook.getPosition(), [8, 7]))).toBeFalsy();
+  expect(board.applyMove(new Move(rook.getPosition(), [7, 8]))).toBeFalsy();
 });
 
 test('accepted bishop moves', () => {
+  const board = new Board();
+  const bishop = new Bishop(white, [5, 5]);
+  board.setBoard([new King(white, [7, 5]), new King(black, [0, 5]), bishop]);
+  let moveTos = [[4, 4], [5, 5], [4, 6], [5, 5]];
+  // Move once all four ways
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(bishop.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(board.getPiece(moveTos[i])).toBe(bishop);
+  }
+  bishop.setPosition([7, 7]);
+  board.setBoard([new King(white, [0, 7]), new King(black, [5, 7]), bishop]);
+  moveTos = [[0, 0], [7, 7]];
+  // Run the four corners
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(bishop.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(board.getPiece(moveTos[i])).toBe(bishop);
+  }
+  bishop.setPosition([0, 7]);
+  board.setBoard([new King(white, [0, 0]), new King(black, [5, 7]), bishop]);
+  moveTos = [[7, 0], [0, 7]];
+  // Run the four corners
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(bishop.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(board.getPiece(moveTos[i])).toBe(bishop);
+  }
+  bishop.setPosition([4, 4]);
+  const blackBishop = new Bishop(black, [5, 5]);
+  board.setBoard([new King(white, [3, 3]), new King(black, [5, 5]), bishop, blackBishop]);
+  // Capture bishop
+  expect(board.applyMove(new Move(bishop.getPosition(), blackBishop.getPosition()))).toBeTruthy();
+  expect(blackBishop.isActive()).toBeFalsy();
 });
 
 test('rejected bishop moves', () => {
+  const board = new Board();
+  const bishop = new Bishop(white, [5, 5]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 5]), bishop]);
+  const moveTos = [[5, 4], [4, 5], [5, 6], [6, 5]];
+  // Move to horizontals
+  for (let i = 0; i < moveTos.length; i += 1) {
+    expect(board.applyMove(new Move(bishop.getPosition(), moveTos[i]))).toBeFalsy();
+    expect(board.getPiece([5, 5])).toBe(bishop);
+  }
+  // Capture white bishop
+  const wBishop = new Bishop(white, [4, 4]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), bishop, wBishop]);
+  expect(board.applyMove(new Move(bishop.getPosition(), wBishop.getPosition()))).toBeFalsy();
+  expect(wBishop.isActive()).toBeTruthy();
+  // Jump over black bishop
+  const bBishop = new Bishop(black, [6, 6]);
+  board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), bishop, bBishop]);
+  expect(board.applyMove(new Move(bishop.getPosition(), [7, 7]))).toBeFalsy();
+  expect(bBishop.isActive()).toBeTruthy();
+  // Out of bounds
+  bishop.setPosition([4, 7]);
+  board.setBoard([new King(white, [7, 7]), new King(black, [0, 7]), bishop]);
+  expect(board.applyMove(new Move(bishop.getPosition(), [5, 8]))).toBeFalsy();
+  expect(board.applyMove(new Move(bishop.getPosition(), [3, 8]))).toBeFalsy();
 });
 
 test('accepted knight moves', () => {
