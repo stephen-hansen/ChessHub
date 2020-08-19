@@ -1,10 +1,11 @@
 {
   "name": "SE-181-Team-Project",
   "version": "1.0.0",
-  "description": "",
+  "description": "Helpful https://socket.io/docs/emit-cheatsheet/",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage && coveralls < coverage/lcov.info",
+    "coverage": "jest --coverage",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -20,13 +21,37 @@
   },
   "homepage": "https://github.com/stephen-hansen/SE-181-Team-Project#readme",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "react-router-dom": "^5.2.0",
+    "react": "^16.13.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
+    "coveralls": "^3.1.0",
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "jest": "^26.4.0",
     "nodemon": "^2.0.4"
+  },
+  "eslintConfig": {
+    "plugins": [
+      "jest"
+    ],
+    "env": {
+      "browser": true,
+      "node": true,
+      "jest/globals": true,
+      "es2020": true
+    },
+    "extends": [
+      "plugin:jest/recommended",
+      "airbnb-base"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 11,
+      "sourceType": "module"
+    },
+    "root": true
   }
 }
