@@ -1,19 +1,19 @@
 const white = 'w';
 const black = 'b';
-const queen = 'queen';
-const rook = 'rook';
-const knight = 'knight';
-const bishop = 'bishop';
-const left = 'left';
-const right = 'right';
+const promoteQueen = 'queen';
+const promoteRook = 'rook';
+const promoteKnight = 'knight';
+const promoteBishop = 'bishop';
+const castleLeft = 'left';
+const castleRight = 'right';
 
 module.exports = {
   white,
   black,
-  queen,
-  rook,
-  knight,
-  bishop,
-  left,
-  right,
+  promoteQueen,
+  promoteRook,
+  promoteKnight,
+  promoteBishop,
+  castleLeft,
+  castleRight,
 };

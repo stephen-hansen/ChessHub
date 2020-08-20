@@ -29,7 +29,6 @@ class Piece {
 
   setPosition(p) {
     this.position = p;
-    this.moved = true;
   }
 
   getMoves(board) {
@@ -46,6 +45,10 @@ class Piece {
       }
     }
     return false;
+  }
+
+  setMoved() {
+    this.moved = true;
   }
 
   hasMoved() {

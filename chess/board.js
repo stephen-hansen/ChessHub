@@ -1,11 +1,17 @@
 /* eslint-disable class-methods-use-this */
-const { black, white } = require('./constants.js');
+const {
+  black,
+  white,
+  castleLeft,
+  castleRight,
+} = require('./constants.js');
 const { Bishop } = require('./bishop.js');
 const { King } = require('./king.js');
 const { Knight } = require('./knight.js');
 const { Pawn } = require('./pawn.js');
 const { Queen } = require('./queen.js');
 const { Rook } = require('./rook.js');
+const { Move } = require('./move.js');
 
 class Board {
   constructor() {
@@ -174,6 +180,7 @@ class Board {
     this.setPiece(toLoc, piece);
     this.setPiece(fromLoc, null);
     piece.setPosition(toLoc);
+    piece.setMoved();
     this.history.push(move);
     // Verify en Passant if it occurs
     this.enPassant();
@@ -256,23 +263,7 @@ class Board {
       return true;
     }
 
-    const opponent = this.getOpponent();
-
-    for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
-      if (piece.getColor() === opponent
-        && piece.isActive()) {
-        const moves = piece.getMoves(this);
-        for (let j = 0; j < moves.length; j += 1) {
-          const to = moves[j].getTo();
-          if (to[0] === kingPos[0] && to[1] === kingPos[1]) {
-            return true;
-          }
-        }
-      }
-    }
-
-    return false;
+    return this.isUnderAttack(kingPos);
   }
 
   isCheckmate() {
@@ -334,9 +325,170 @@ class Board {
       && from[1] >= 0 && from[1] < 8);
   }
 
+  isUnderAttack(loc) {
+    const opponent = this.getOpponent();
+    const pieces = this.getPieces();
+
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = pieces[i];
+      if (piece.getColor() === opponent
+        && piece.isActive()) {
+        const moves = piece.getMoves(this);
+        for (let j = 0; j < moves.length; j += 1) {
+          const to = moves[j].getTo();
+          if (to[0] === loc[0] && to[1] === loc[1]) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  mayCastle(direction) {
+    // 1. The castling must be kingside or queenside
+    if (direction !== castleLeft && direction !== castleRight) {
+      return false;
+    }
+
+    const row = this.getTurn() === white ? 7 : 0;
+    const rookCol = direction === castleLeft ? 0 : 8;
+
+    // 2. Neither the king nor the chosen rook has previously moved
+    const king = this.getPiece([row, 4]);
+    const rook = this.getPiece([row, rookCol]);
+    if (king === null || rook === null) {
+      return false;
+    }
+    if (king.hasMoved() === true || rook.hasMoved() === true) {
+      return false;
+    }
+
+    // 3. There are no pieces between the king and the chosen rook
+    const spaces = direction === castleLeft ? [[row, 1], [row, 2], [row, 3]] : [[row, 5], [row, 6]];
+    for (let i = 0; i < spaces.length; i += 1) {
+      const piece = this.getPiece(spaces[i]);
+      if (piece !== null) {
+        return false;
+      }
+    }
+
+    // 4. The king is not currently in check
+    if (this.isCheck()) {
+      return false;
+    }
+
+    const attackedSpaces = direction === castleLeft ? [[row, 2], [row, 3]] : [[row, 5], [row, 6]];
+    // 5. The king does not pass through a square that is attacked by an enemy piece
+    for (let i = 0; i < attackedSpaces.length; i += 1) {
+      if (this.isUnderAttack(attackedSpaces[i])) {
+        return false;
+      }
+    }
+
+    // 6. The king does not end up in check
+    // Simulate the move and see if it places the player in check
+    const k = king.getPosition();
+    const r = rook.getPosition();
+    const kTo = direction === castleLeft ? [row, 2] : [row, 6];
+    const rTo = direction === castleLeft ? [row, 3] : [row, 5];
+    this.setPiece(k, null);
+    this.setPiece(r, null);
+    this.setPiece(kTo, king);
+    this.setPiece(rTo, rook);
+    king.setPosition(kTo);
+    rook.setPosition(rTo);
+    const causesCheck = this.isCheck();
+    // Undo the move
+    rook.setPosition(r);
+    king.setPosition(k);
+    this.setPiece(rTo, null);
+    this.setPiece(kTo, null);
+    this.setPiece(r, rook);
+    this.setPiece(k, king);
+    return causesCheck;
+  }
+
+  applyCastle(direction) {
+    const result = this.mayCastle(direction);
+    if (result) {
+      // Success - apply the move.
+      const row = this.getTurn() === white ? 7 : 0;
+      const rookCol = direction === castleLeft ? 0 : 8;
+      const king = this.getPiece([row, 4]);
+      const rook = this.getPiece([row, rookCol]);
+      const k = king.getPosition();
+      const r = rook.getPosition();
+      const kTo = direction === castleLeft ? [row, 2] : [row, 6];
+      const rTo = direction === castleLeft ? [row, 3] : [row, 5];
+      this.setPiece(k, null);
+      this.setPiece(r, null);
+      this.setPiece(kTo, king);
+      this.setPiece(rTo, rook);
+      king.setPosition(kTo);
+      king.setMoved();
+      rook.setPosition(rTo);
+      rook.setMoved();
+      this.history.push(direction);
+      // Verify en Passant if it occurs (disable it for opponent)
+      this.enPassant();
+      this.setTurn(this.getOpponent());
+    }
+    return result;
+  }
+
+  undo(numMoves) {
+    const hist = this.getHistory();
+    if (numMoves > hist.length) {
+      return false;
+    }
+    this.history = hist.slice(0, hist.length - numMoves);
+    // Re-simulate all of the moves
+    // Reset board
+    this.setTurn(white);
+    this.setBoard(this.createPieces());
+    for (let i = 0; i < this.history.length; i += 1) {
+      const move = this.history[i];
+      if (move instanceof Move) {
+        const toLoc = move.getTo();
+        const fromLoc = move.getFrom();
+        const piece = this.getPiece(fromLoc);
+        const pieceAtMove = this.getPiece(toLoc);
+        if (pieceAtMove !== null) {
+          pieceAtMove.setActive(false);
+        }
+        this.setPiece(toLoc, piece);
+        this.setPiece(fromLoc, null);
+        piece.setPosition(toLoc);
+        piece.setMoved();
+      } else if (move === castleLeft || move === castleRight) {
+        const direction = move;
+        const row = this.getTurn() === white ? 7 : 0;
+        const rookCol = direction === castleLeft ? 0 : 8;
+        const king = this.getPiece([row, 4]);
+        const rook = this.getPiece([row, rookCol]);
+        const k = king.getPosition();
+        const r = rook.getPosition();
+        const kTo = direction === castleLeft ? [row, 2] : [row, 6];
+        const rTo = direction === castleLeft ? [row, 3] : [row, 5];
+        this.setPiece(k, null);
+        this.setPiece(r, null);
+        this.setPiece(kTo, king);
+        this.setPiece(rTo, rook);
+        king.setPosition(kTo);
+        king.setMoved();
+        rook.setPosition(rTo);
+        rook.setMoved();
+      }
+      this.enPassant();
+      this.setTurn(this.getOpponent());
+    }
+
+    return true;
+  }
+
   // TODO
-  // add conditions for castling
-  // add undo
   // check promotion and en passant ONLY after a pawn move
   // implement promotion
 }
