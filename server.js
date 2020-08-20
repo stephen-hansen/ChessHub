@@ -62,9 +62,12 @@ io.on("connection", socket => {
 
 	   	//join the socket to the game room
 	   	socket.join(user.gameId);
-	   	io.sockets.in(user.gameId).emit("game", user.username + " has entered the game");
+
+	   	if (getGames()[gameId].length === 1)
+	   		io.to(socket.id).emit("game", "player=White");
 
 	   	if (getGames()[gameId].length === 2) {
+	   		io.to(socket.id).emit("game", "player=Black");
 	   		io.sockets.in(user.gameId).emit("gameStart");
 	   	}
 	});

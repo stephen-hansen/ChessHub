@@ -65,14 +65,16 @@ class Game extends React.Component{
 	constructor() {
 		super();
 		this.params = getParamsFromURL(window.location.href);
-		console.log("Emitted socket joinGame");
 		this.state = {
+			forfeit: false,
 			ready: false,
 			board: beginningChessBoard(),
 			highlightSquares: [],
 			whiteDeaths: [],
 			blackDeaths: [],
-			turn: 0
+			player: null,
+			turn: 0,
+			info: ""
 		}
 	}
 
@@ -81,6 +83,17 @@ class Game extends React.Component{
 		this.socket.emit("joinGame", this.params);
 		this.socket.on("game", (msg) => {
 			console.log(msg);
+			if (!this.state.player && msg.includes("player=")) {
+				this.setState({
+					player: msg.substr(7)
+				});
+			}
+		});
+		this.socket.on("forfeit", () => {
+			this.setState({
+				forfeit: true
+			});
+			console.log("Your opponent has left");
 		});
 		this.socket.on("gameStart", () => {
 			this.setState({
@@ -121,11 +134,14 @@ class Game extends React.Component{
 	            </div>
 	            <div className="game-column info">
 	            	<GameInfo
-	            	player="White"
+	            	player={this.state.player}
 	            	turn={this.state.turn}
 	            	white={this.state.whiteDeaths}
 	            	black={this.state.blackDeaths}
 	            	/>
+	            </div>
+	            <div className="lower-info">
+	            	<h3>{this.state.info}</h3>
 	            </div>
             </div>
         );
@@ -139,7 +155,7 @@ class Game extends React.Component{
 	}
 
     render(){
-    	let {ready} = this.state;
+    	let {ready, forfeit} = this.state;
         if (ready)
         	return this.renderGame();
         else {
