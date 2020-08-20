@@ -6,7 +6,7 @@ const { Knight } = require('./knight.js');
 const { Rook } = require('./rook.js');
 const { Bishop } = require('./bishop.js');
 const { Move } = require('./move.js');
-const { black, white } = require('./constants.js');
+const { black, white, castleLeft, castleRight } = require('./constants.js');
 
 test('board initializes to default board layout', () => {
   const newBoard = new Board();
@@ -370,4 +370,87 @@ test('en passant capture', () => {
 });
 
 test('castle left/right', () => {
+  let board = new Board();
+  board.setPiece([7, 1], null);
+  board.setPiece([7, 2], null);
+  board.setPiece([7, 3], null);
+  board.setPiece([0, 1], null);
+  board.setPiece([0, 2], null);
+  board.setPiece([0, 3], null);
+  // Castle left white
+  expect(board.applyCastle(castleLeft)).toBeTruthy();
+  // Castle left black
+  expect(board.applyCastle(castleLeft)).toBeTruthy();
+  // Check pieces
+  expect(board.getPiece([7, 2])).toBeInstanceOf(King);
+  expect(board.getPiece([7, 3])).toBeInstanceOf(Rook);
+  expect(board.getPiece([0, 2])).toBeInstanceOf(King);
+  expect(board.getPiece([0, 3])).toBeInstanceOf(Rook);
+  
+  // Reset board
+  board = new Board();
+  board.setPiece([7, 5], null);
+  board.setPiece([7, 6], null);
+  board.setPiece([0, 5], null);
+  board.setPiece([0, 6], null);
+  // Castle right white
+  expect(board.applyCastle(castleRight)).toBeTruthy();
+  // Castle right black
+  expect(board.applyCastle(castleRight)).toBeTruthy();
+  // Check pieces
+  expect(board.getPiece([7, 6])).toBeInstanceOf(King);
+  expect(board.getPiece([7, 5])).toBeInstanceOf(Rook);
+  expect(board.getPiece([0, 6])).toBeInstanceOf(King);
+  expect(board.getPiece([0, 5])).toBeInstanceOf(Rook);
+
+  // Blocking pieces test
+  board = new Board();
+  expect(board.applyCastle(castleLeft)).toBeFalsy();
+  expect(board.applyCastle(castleRight)).toBeFalsy();
+
+  // Moved rook test
+  board = new Board();
+  board.setPiece([7, 1], null);
+  board.setPiece([7, 2], null);
+  board.setPiece([7, 3], null);
+  board.setPiece([7, 5], null);
+  board.setPiece([7, 6], null);
+  expect(board.applyMove(new Move([7, 0], [7, 1]))).toBeTruthy();
+  board.setTurn(white);
+  expect(board.applyMove(new Move([7, 1], [7, 0]))).toBeTruthy();
+  board.setTurn(white);
+  expect(board.applyCastle(castleLeft)).toBeFalsy();
+
+  // Moved king test
+  board = new Board();
+  board.setPiece([7, 1], null);
+  board.setPiece([7, 2], null);
+  board.setPiece([7, 3], null);
+  expect(board.applyMove(new Move([7, 4], [7, 3]))).toBeTruthy();
+  board.setTurn(white);
+  expect(board.applyMove(new Move([7, 3], [7, 4]))).toBeTruthy();
+  board.setTurn(white);
+  expect(board.applyCastle(castleLeft)).toBeFalsy();
+
+  // Invalid text test
+  expect(board.applyCastle('foobar')).toBeFalsy();
+
+  // King in check test
+  board = new Board();
+  board.setBoard(new King(white, [7, 4]),
+    new Rook(white, [7, 0]),
+    new King(black, [0, 7]),
+    new Rook(black, [0, 4]));
+  expect(board.applyCastle(castleLeft)).toBeFalsy();
+
+  // Pass through attacked square test
+  board = new Board();
+  board.setBoard(new King(white, [7, 4]),
+    new Rook(white, [7, 0]),
+    new King(black, [0, 7]),
+    new Rook(black, [0, 3]));
+  expect(board.applyCastle(castleLeft)).toBeFalsy();
+});
+
+test('undo moves', () => {
 });

@@ -353,7 +353,7 @@ class Board {
     }
 
     const row = this.getTurn() === white ? 7 : 0;
-    const rookCol = direction === castleLeft ? 0 : 8;
+    const rookCol = direction === castleLeft ? 0 : 7;
 
     // 2. Neither the king nor the chosen rook has previously moved
     const king = this.getPiece([row, 4]);
@@ -387,35 +387,15 @@ class Board {
       }
     }
 
-    // 6. The king does not end up in check
-    // Simulate the move and see if it places the player in check
-    const k = king.getPosition();
-    const r = rook.getPosition();
-    const kTo = direction === castleLeft ? [row, 2] : [row, 6];
-    const rTo = direction === castleLeft ? [row, 3] : [row, 5];
-    this.setPiece(k, null);
-    this.setPiece(r, null);
-    this.setPiece(kTo, king);
-    this.setPiece(rTo, rook);
-    king.setPosition(kTo);
-    rook.setPosition(rTo);
-    const causesCheck = this.isCheck();
-    // Undo the move
-    rook.setPosition(r);
-    king.setPosition(k);
-    this.setPiece(rTo, null);
-    this.setPiece(kTo, null);
-    this.setPiece(r, rook);
-    this.setPiece(k, king);
-    return causesCheck;
+    return true;
   }
 
   applyCastle(direction) {
-    const result = this.mayCastle(direction);
+    let result = this.mayCastle(direction);
     if (result) {
       // Success - apply the move.
       const row = this.getTurn() === white ? 7 : 0;
-      const rookCol = direction === castleLeft ? 0 : 8;
+      const rookCol = direction === castleLeft ? 0 : 7;
       const king = this.getPiece([row, 4]);
       const rook = this.getPiece([row, rookCol]);
       const k = king.getPosition();
@@ -427,13 +407,26 @@ class Board {
       this.setPiece(kTo, king);
       this.setPiece(rTo, rook);
       king.setPosition(kTo);
-      king.setMoved();
       rook.setPosition(rTo);
-      rook.setMoved();
-      this.history.push(direction);
-      // Verify en Passant if it occurs (disable it for opponent)
-      this.enPassant();
-      this.setTurn(this.getOpponent());
+      const causesCheck = this.isCheck();
+      if (causesCheck) {
+        result = false;
+        // Undo the move
+        rook.setPosition(r);
+        king.setPosition(k);
+        this.setPiece(rTo, null);
+        this.setPiece(kTo, null);
+        this.setPiece(r, rook);
+        this.setPiece(k, king);
+      } else {
+        // Record move
+        king.setMoved();
+        rook.setMoved();
+        this.history.push(direction);
+        // Verify en Passant if it occurs (disable it for opponent)
+        this.enPassant();
+        this.setTurn(this.getOpponent());
+      }
     }
     return result;
   }
