@@ -1,4 +1,5 @@
 Make sure that only two users can join a game
+Remove the user from the game on disconnect
 Add a frontend redirect after successfully connecting two people (maybe just hide?)
 Add frontend validation for all input fields (should look nicer obviously, maybe we want to change order of operations)
 We may want to consider incorporating a DB so that refreshing doesn't kill the game (out of scope?)

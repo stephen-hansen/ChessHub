@@ -1,0 +1,76 @@
+input {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 40px 0;
+  box-sizing: border-box;
+  border-radius: 10px;
+  align-items: center;
+  background-color: #333333;
+  color: white;
+  font-size: large;
+}
+
+body{
+    font-family: "Candara";
+    font-size: 30px;
+    background-color: #c4ced4;
+    color: #333333;
+    text-align: center;
+}
+button{
+  /* background-color:#333333; */
+  background-color: #70a2a3;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  font-size: 30px;
+  border-radius: 10px;
+  align-items: center;
+  margin: 40px 0;
+
+}
+
+.action{
+  width: 500px;
+  margin: 0 auto;
+}
+
+
+.square {
+  background: transparent;
+  border: 0px solid transparent;
+  /* float: center; */
+  float: center;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  margin-right: -1px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: none;
+  text-align: center;
+  width: 50px;
+  height: 60px;
+}
+
+/* theme coral from http://omgchess.blogspot.com/2015/09/ */
+.dark-square {
+  background-color: #70a2a3;
+}
+
+.light-square {
+  background-color: #B1E4B9;
+}
+
+.highlighted {
+  border: 1px solid yellow;
+} 
+
+.nun {
+  border: 1px solid black;
+}
+
+.game-column {
+  float: left;
+  width: 50%;
+}
