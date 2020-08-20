@@ -14,6 +14,18 @@ class Board {
     this.history = [];
   }
 
+  setTurn(player) {
+    this.turn = player;
+  }
+
+  getTurn() {
+    return this.turn;
+  }
+
+  getHistory() {
+    return this.history;
+  }
+
   setBoard(pieces) {
     this.board = this.loadBoard(pieces);
   }
@@ -31,7 +43,7 @@ class Board {
   }
 
   getOpponent() {
-    if (this.turn === white) {
+    if (this.getTurn() === white) {
       return black;
     }
     return white;
@@ -99,7 +111,8 @@ class Board {
 
   isValidMove(piece, move) {
     // Check that the move is valid and that it does not cause check
-    return piece.isActive() && piece.isValidMove(move, this) && !this.causesCheck(piece, move);
+    return piece.isActive() && piece.getColor() === this.getTurn()
+      && piece.isValidMove(move, this) && !this.causesCheck(piece, move);
   }
 
   causesCheck(piece, move) {
@@ -164,7 +177,7 @@ class Board {
     this.history.push(move);
     // Verify en Passant if it occurs
     this.enPassant();
-    this.turn = this.getOpponent();
+    this.setTurn(this.getOpponent());
     return true;
   }
 
@@ -204,7 +217,7 @@ class Board {
         }
         // Check if the player put a pawn in capture spot
         if (captureSpot !== null
-          && captureSpot.getColor() === this.turn
+          && captureSpot.getColor() === this.getTurn()
           && captureSpot instanceof Pawn) {
           // Remove the piece if player just captured
           this.setPiece(pos, null);
@@ -231,7 +244,7 @@ class Board {
     const pieces = this.getPieces();
     for (let i = 0; i < pieces.length; i += 1) {
       const piece = pieces[i];
-      if (piece.getColor() === this.turn
+      if (piece.getColor() === this.getTurn()
         && piece instanceof King
         && piece.isActive()) {
         kingPos = piece.getPosition();
@@ -270,9 +283,9 @@ class Board {
     // 2. Loop over all pieces
     const pieces = this.getPieces();
     for (let i = 0; i < pieces.length; i += 1) {
-      // 3. If piece.getColor() == this.turn
+      // 3. If piece.getColor() == this.getTurn()
       const piece = pieces[i];
-      if (piece.getColor() === this.turn
+      if (piece.getColor() === this.getTurn()
         && piece.isActive()) {
         // 4. Generate all moves for the piece
         // Filter moves out which maintain check
@@ -295,7 +308,7 @@ class Board {
     const pieces = this.getPieces();
     for (let i = 0; i < pieces.length; i += 1) {
       const piece = pieces[i];
-      if (piece.getColor() === this.turn
+      if (piece.getColor() === this.getTurn()
         && piece.isActive()) {
         const moves = this.filterMoves(piece);
         // A move exists.
