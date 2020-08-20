@@ -473,4 +473,42 @@ test('piece ADT does not have moves', () => {
 });
 
 test('undo moves', () => {
+  const board = new Board();
+  // Castle left white
+  board.applyCastle(castleLeft);
+  // Castle left black
+  board.applyCastle(castleLeft);
+  // Free up white's bishop
+  board.applyMove(new Move([6, 4], [5, 4]));
+  // Free up black's bishop
+  board.applyMove(new Move([1, 4], [2, 4]));
+  // Save state of board
+  const state1 = JSON.stringify(board.getBoard());
+  // Move out white's bishop
+  board.applyMove(new Move([7, 5], [2, 0]));
+  // Capture the bishop with black's pawn
+  board.applyMove(new Move([1, 1], [2, 0]));
+  // Undo the bishop move
+  expect(board.undo(2)).toBeTruthy();
+  // Verify states are equal
+  expect(JSON.stringify(board.getBoard())).toStrictEqual(state1);
+  // Move the bishop out
+  board.applyMove(new Move([7, 5], [5, 3]));
+  // Move black's bishop out
+  board.applyMove(new Move([0, 5], [2, 3]));
+  // Move white's knight out
+  board.applyMove(new Move([7, 6], [5, 7]));
+  // Move black's knight out
+  board.applyMove(new Move([0, 6], [2, 7]));
+  // Castle right on white
+  board.applyCastle(castleRight);
+  // Save state
+  const state2 = JSON.stringify(board.getBoard());
+  // Castle right on black
+  board.applyCastle(castleRight);
+  // Undo the last move
+  expect(board.undo(1)).toBeTruthy();
+  expect(JSON.stringify(board.getBoard())).toStrictEqual(state2);
+  // Do not undo 100 moves, would be errorneous
+  expect(board.undo(100)).toBeFalsy();
 });

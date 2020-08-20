@@ -428,7 +428,7 @@ class Board {
     // Re-simulate all of the moves
     // Reset board
     this.setTurn(white);
-    this.setBoard(this.createPieces());
+    this.board = this.loadBoard(this.createPieces());
     for (let i = 0; i < this.history.length; i += 1) {
       const move = this.history[i];
       if (move instanceof Move) {
@@ -446,7 +446,7 @@ class Board {
       } else if (move === castleLeft || move === castleRight) {
         const direction = move;
         const row = this.getTurn() === white ? 7 : 0;
-        const rookCol = direction === castleLeft ? 0 : 8;
+        const rookCol = direction === castleLeft ? 0 : 7;
         const king = this.getPiece([row, 4]);
         const rook = this.getPiece([row, rookCol]);
         const k = king.getPosition();
