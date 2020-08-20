@@ -49,8 +49,6 @@ class Pawn extends Piece {
       }
     }
 
-    // TODO really need to rewrite this
-
     // Handle capture left
     const moveLeft = new Move(this.getPosition(), [row + direction, col - 1]);
     if (b.isInBounds(moveLeft)) {

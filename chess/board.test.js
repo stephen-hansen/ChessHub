@@ -6,7 +6,13 @@ const { Knight } = require('./knight.js');
 const { Rook } = require('./rook.js');
 const { Bishop } = require('./bishop.js');
 const { Move } = require('./move.js');
-const { black, white, castleLeft, castleRight } = require('./constants.js');
+const { Piece } = require('./piece.js');
+const {
+  black,
+  white,
+  castleLeft,
+  castleRight,
+} = require('./constants.js');
 
 test('board initializes to default board layout', () => {
   const newBoard = new Board();
@@ -39,6 +45,9 @@ test('board initializes to default board layout', () => {
     expect(wPiece.isActive()).toBeTruthy();
     expect(wPiece.getPosition()).toStrictEqual([7, i]);
   }
+
+  expect(newBoard.getHistory().length).toBe(0);
+  expect(newBoard.getBoard()).not.toBeNull();
 });
 
 test('accepted pawn moves', () => {
@@ -322,6 +331,11 @@ test('detect check in move validation', () => {
   board.setTurn(white);
   expect(board.applyMove(new Move([7, 5], [6, 5]))).toBeFalsy();
   expect(board.applyMove(new Move([7, 5], [7, 4]))).toBeTruthy();
+  // Board with no white king
+  board.setBoard([new King(black, [4, 5])]);
+  board.setTurn(white);
+  expect(board.isCheck()).toBeTruthy();
+  expect(board.applyMove(new Move([0, 0], [0, 1]))).toBeFalsy();
 });
 
 test('detect checkmate', () => {
@@ -386,7 +400,7 @@ test('castle left/right', () => {
   expect(board.getPiece([7, 3])).toBeInstanceOf(Rook);
   expect(board.getPiece([0, 2])).toBeInstanceOf(King);
   expect(board.getPiece([0, 3])).toBeInstanceOf(Rook);
-  
+
   // Reset board
   board = new Board();
   board.setPiece([7, 5], null);
@@ -437,19 +451,25 @@ test('castle left/right', () => {
 
   // King in check test
   board = new Board();
-  board.setBoard(new King(white, [7, 4]),
+  board.setBoard([new King(white, [7, 4]),
     new Rook(white, [7, 0]),
     new King(black, [0, 7]),
-    new Rook(black, [0, 4]));
+    new Rook(black, [0, 4])]);
   expect(board.applyCastle(castleLeft)).toBeFalsy();
 
   // Pass through attacked square test
   board = new Board();
-  board.setBoard(new King(white, [7, 4]),
+  board.setBoard([new King(white, [7, 4]),
     new Rook(white, [7, 0]),
     new King(black, [0, 7]),
-    new Rook(black, [0, 3]));
+    new Rook(black, [0, 3])]);
   expect(board.applyCastle(castleLeft)).toBeFalsy();
+});
+
+test('piece ADT does not have moves', () => {
+  const piece = new Piece(white, [0, 0]);
+  const board = new Board();
+  expect(() => { piece.getMoves(board); }).toThrow(TypeError);
 });
 
 test('undo moves', () => {

@@ -32,9 +32,7 @@ class Piece {
   }
 
   getMoves(board) {
-    if (new.target === Piece) {
-      throw new TypeError('Need to implement getMoves method');
-    }
+    throw new TypeError('Need to implement getMoves method');
   }
 
   isValidMove(move, board) {

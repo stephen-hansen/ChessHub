@@ -203,7 +203,7 @@ class Board {
 
   enPassant() {
     const pieces = this.getPieces();
-    for (let i = 0; i < pieces; i += 1) {
+    for (let i = 0; i < pieces.length; i += 1) {
       const piece = pieces[i];
       const pos = piece.getPosition();
       const row = pos[0];
@@ -358,10 +358,10 @@ class Board {
     // 2. Neither the king nor the chosen rook has previously moved
     const king = this.getPiece([row, 4]);
     const rook = this.getPiece([row, rookCol]);
-    if (king === null || rook === null) {
-      return false;
-    }
-    if (king.hasMoved() === true || rook.hasMoved() === true) {
+    if (king === null || rook === null
+    || king.hasMoved() === true || rook.hasMoved() === true
+    || king.getColor() !== this.getTurn() || rook.getColor() !== this.getTurn()
+    || !(king instanceof King) || !(rook instanceof Rook)) {
       return false;
     }
 
@@ -391,7 +391,7 @@ class Board {
   }
 
   applyCastle(direction) {
-    let result = this.mayCastle(direction);
+    const result = this.mayCastle(direction);
     if (result) {
       // Success - apply the move.
       const row = this.getTurn() === white ? 7 : 0;
@@ -408,25 +408,13 @@ class Board {
       this.setPiece(rTo, rook);
       king.setPosition(kTo);
       rook.setPosition(rTo);
-      const causesCheck = this.isCheck();
-      if (causesCheck) {
-        result = false;
-        // Undo the move
-        rook.setPosition(r);
-        king.setPosition(k);
-        this.setPiece(rTo, null);
-        this.setPiece(kTo, null);
-        this.setPiece(r, rook);
-        this.setPiece(k, king);
-      } else {
-        // Record move
-        king.setMoved();
-        rook.setMoved();
-        this.history.push(direction);
-        // Verify en Passant if it occurs (disable it for opponent)
-        this.enPassant();
-        this.setTurn(this.getOpponent());
-      }
+      // Record move
+      king.setMoved();
+      rook.setMoved();
+      this.history.push(direction);
+      // Verify en Passant if it occurs (disable it for opponent)
+      this.enPassant();
+      this.setTurn(this.getOpponent());
     }
     return result;
   }
