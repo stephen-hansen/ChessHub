@@ -144,7 +144,7 @@ class Board {
     for (let i = 0; i < moves.length; i += 1) {
       const move = moves[i];
       if (!(this.causesCheck(piece, move))) {
-        finalMoves.push(moves);
+        finalMoves.push(move);
       }
     }
     return finalMoves;
