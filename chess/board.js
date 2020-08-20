@@ -218,9 +218,9 @@ class Board {
         piece.disableEnPassant();
         let captureSpot = null;
         if (piece.getColor() === white) {
-          captureSpot = this.getPiece([row - 1, col]);
-        } else {
           captureSpot = this.getPiece([row + 1, col]);
+        } else {
+          captureSpot = this.getPiece([row - 1, col]);
         }
         // Check if the player put a pawn in capture spot
         if (captureSpot !== null

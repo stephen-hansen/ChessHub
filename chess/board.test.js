@@ -375,12 +375,69 @@ test('detect stalemate', () => {
 });
 
 test('pawn promotion', () => {
+  const board = new Board();
+  // Test white pawn promote
+  let pawn = new Pawn(white, [1, 7]);
+  board.setBoard([new King(white, [7, 7]),
+    new King(black, [0, 0]),
+    pawn]);
+  expect(board.applyMove(new Move([1, 7], [0, 7]))).toBeTruthy();
+  expect(pawn.canPromote()).toBeTruthy();
+  // Test black pawn promote
+  pawn = new Pawn(black, [6, 0]);
+  board.setBoard([new King(white, [7, 7]),
+    new King(black, [0, 0]),
+    pawn]);
+  board.setTurn(black);
+  expect(board.applyMove(new Move([6, 0], [7, 0]))).toBeTruthy();
+  expect(pawn.canPromote()).toBeTruthy();
+  // TODO add the promotion code to board
 });
 
 test('initial pawn move', () => {
 });
 
 test('en passant capture', () => {
+  const board = new Board();
+  // Right capture, black
+  let passantPawn = new Pawn(white, [6, 3]);
+  let capturingPawn = new Pawn(black, [4, 2]);
+  board.setBoard([new King(white, [1, 7]),
+    new King(black, [0, 0]),
+    passantPawn,
+    capturingPawn]);
+  expect(board.applyMove(new Move([6, 3], [4, 3]))).toBeTruthy();
+  expect(passantPawn.isEnPassant()).toBeTruthy();
+  expect(board.applyMove(new Move([4, 2], [5, 3]))).toBeTruthy();
+  expect(passantPawn.isActive()).toBeFalsy();
+  expect(board.getPiece([4, 3])).toBeNull();
+  // Left capture, white
+  board.setTurn(black);
+  passantPawn = new Pawn(black, [1, 3]);
+  capturingPawn = new Pawn(white, [3, 4]);
+  board.setBoard([new King(white, [1, 7]),
+    new King(black, [0, 0]),
+    passantPawn,
+    capturingPawn]);
+  expect(board.applyMove(new Move([1, 3], [3, 3]))).toBeTruthy();
+  expect(passantPawn.isEnPassant()).toBeTruthy();
+  expect(board.applyMove(new Move([3, 4], [2, 3]))).toBeTruthy();
+  expect(passantPawn.isActive()).toBeFalsy();
+  expect(board.getPiece([3, 3])).toBeNull();
+  // Test en Passant to only last one turn
+  board.setTurn(white);
+  passantPawn = new Pawn(white, [6, 3]);
+  capturingPawn = new Pawn(black, [4, 4]);
+  board.setBoard([new King(white, [1, 7]),
+    new King(black, [0, 0]),
+    passantPawn,
+    capturingPawn]);
+  expect(board.applyMove(new Move([6, 3], [4, 3]))).toBeTruthy();
+  expect(passantPawn.isEnPassant()).toBeTruthy();
+  expect(board.applyMove(new Move([0, 0], [0, 1]))).toBeTruthy();
+  expect(passantPawn.isEnPassant()).toBeFalsy();
+  board.setTurn(black);
+  expect(board.applyMove(new Move([4, 4], [5, 3]))).toBeFalsy();
 });
 
 test('castle left/right', () => {
