@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const port = process.env.PORT || 8080;
 
-const { newGame, joinGame, gameJoinable, leaveGame, getGames } = require("./utils/games.js");
+const { newGame, joinGame, gameJoinable, leaveGame, getGames, clearEmptyGames } = require("./utils/games.js");
 const { userJoin, userLeave, getUsers } = require("./utils/users.js");
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -41,6 +41,15 @@ app.post("/api/joinGame", (req,res) => {
 		res.sendStatus(400);
 	}
 })
+
+//TODO
+// Clear Empty games and notify users in games in which someone has left
+app.post("/api/declareLeave", (req, res) => {
+	let {username, gameId} = req.body;
+	console.log(username, "has left game", gameId);
+	clearEmptyGames();
+	res.sendStatus(200);
+});
 
 
 //socket handling 

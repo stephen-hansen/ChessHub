@@ -1,7 +1,8 @@
 import React from 'react';
 // import './App.css';
 import './App.css';
-import Board from './Board';
+import Board from './Board.js';
+import GameInfo from './GameInfo.js'
 import Bishop from './pieces/bishop.js';
 import King from './pieces/king.js';
 import Knight from './pieces/knight.js';
@@ -45,34 +46,50 @@ class Game extends React.Component{
 		super();
 		this.state = {
 			board: beginningChessBoard(),
-			highlightSquares: []
+			highlightSquares: [],
+			whiteDeaths: [],
+			blackDeaths: [],
+			turn: 0
 		}
 	}
 
 	handleClick(i) {
-		console.log(i);
-		this.highlightSquares([i]);
+		// console.log(i);
+		// this.highlightSquares([i]);
 
 		this.setState({
 			board: this.state.board,
-			highlightSquares: this.state.highlightSquares
+			highlightSquares: this.state.highlightSquares,
+			whiteDeaths: [],
+			blackDeaths: [],
+			turn: 0
 		});
 	}
 
 	highlightSquares(arrSquares) {
 		this.state.highlightSquares = arrSquares;
-		console.log(this.state.highlightSquares);
+		// console.log(this.state.highlightSquares);
 	}
 
     render(){
         return (
             <div className="gamePage">
                 <h1> ChessHub Game Page </h1>
-                <Board 
-                squares = {this.state.board}
-                highlighted = {this.state.highlightSquares}
-                onClick = {(i) => this.handleClick(i)}
-                />
+                <div className="game-column board">
+	                <Board 
+	                squares = {this.state.board}
+	                highlighted = {this.state.highlightSquares}
+	                onClick = {(i) => this.handleClick(i)}
+	                />
+	            </div>
+	            <div className="game-column info">
+	            	<GameInfo
+	            	player="White"
+	            	turn={this.state.turn}
+	            	white={this.state.whiteDeaths}
+	            	black={this.state.blackDeaths}
+	            	/>
+	            </div>
             </div>
         );
     }

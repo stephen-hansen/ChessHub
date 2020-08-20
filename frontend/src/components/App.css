@@ -69,3 +69,8 @@ button{
 .nun {
   border: 1px solid black;
 }
+
+.game-column {
+  float: left;
+  width: 50%;
+}
