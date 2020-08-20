@@ -13,7 +13,7 @@ function createGame() {
                 .then((json) => {
 
                     //redirect user to the game
-                    window.location.href = "/loading?username=" + username + "&gameId=" + json.gameId;
+                    window.location.href = "/g?username=" + username + "&gameId=" + json.gameId;
                 });
         })
         .catch(err => {
@@ -48,38 +48,8 @@ function joinGame() {
         });
 }
 
-function declareLeave(username, gameId) {
-  console.log("Leaving game...", username, gameId);
-  fetch("http://localhost:8080/api/declareLeave", {
-            method: "POST",
-            body: JSON.stringify({
-                username: username,
-                gameId: gameId
-            }),
-            headers: {
-                "Content-Type": "application/json"
-            },
-        }).then((response) => {
-            if (response.ok) {
-                //redirect user to the game
-                // window.location.href = "/";
-            } else {
-                console.log("unknown error");
-            }
-
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-
 
 export {
-    joinGame
-};
-export {
+    joinGame,
     createGame
-};
-export {
-  declareLeave
 };

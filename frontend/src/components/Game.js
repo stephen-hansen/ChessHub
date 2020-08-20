@@ -2,13 +2,17 @@ import React from 'react';
 // import './App.css';
 import './App.css';
 import Board from './Board.js';
-import GameInfo from './GameInfo.js'
+import GameInfo from './GameInfo.js';
+import Loading from './Loading.js';
 import Bishop from './pieces/bishop.js';
 import King from './pieces/king.js';
 import Knight from './pieces/knight.js';
 import Pawn from './pieces/pawn.js';
 import Queen from './pieces/queen.js';
 import Rook from './pieces/rook.js';
+
+import io from 'socket.io-client';
+
 
 function beginningChessBoard() {
 	const squares = Array(64).fill(null);
@@ -41,16 +45,49 @@ function beginningChessBoard() {
 	return squares;
 }
 
+function getParamsFromURL(url) {
+    let urls = url.split("?")[1].split("&");
+    let params = {
+        username: "null",
+        gameId: "null"
+    }
+    urls.forEach((val) => {
+        if (val.includes("username=")) {
+            params.username = val.substr(9);
+        } else if (val.includes("gameId=")) {
+            params.gameId = val.substr(7);
+        }
+    });
+    return params;
+}
+
 class Game extends React.Component{
 	constructor() {
 		super();
+		this.params = getParamsFromURL(window.location.href);
+		console.log("Emitted socket joinGame");
 		this.state = {
+			ready: false,
 			board: beginningChessBoard(),
 			highlightSquares: [],
 			whiteDeaths: [],
 			blackDeaths: [],
 			turn: 0
 		}
+	}
+
+	componentDidMount() {
+		this.socket = io("http://localhost:8080");
+		this.socket.emit("joinGame", this.params);
+		this.socket.on("game", (msg) => {
+			console.log(msg);
+		});
+		this.socket.on("gameStart", () => {
+			this.setState({
+				ready: true
+			});
+		});
+		console.log("Emitted socket joinGame");
 	}
 
 	handleClick(i) {
@@ -71,8 +108,8 @@ class Game extends React.Component{
 		// console.log(this.state.highlightSquares);
 	}
 
-    render(){
-        return (
+	renderGame() {
+		return (
             <div className="gamePage">
                 <h1> ChessHub Game Page </h1>
                 <div className="game-column board">
@@ -92,6 +129,22 @@ class Game extends React.Component{
 	            </div>
             </div>
         );
+	}
+
+	renderLoading() {
+		return <Loading
+				username= {this.params.username}
+				gameid= {this.params.gameId}
+				/>
+	}
+
+    render(){
+    	let {ready} = this.state;
+        if (ready)
+        	return this.renderGame();
+        else {
+        	return this.renderLoading();
+        }
     }
 }
 

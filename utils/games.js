@@ -43,11 +43,6 @@ function gameJoinable(gameId){
 	}
 }
 
-function clearEmptyGames() {
-   //TODO
-   console.log("Clearing empty games...");
-}
-
 function getGames() { return games; }
 
 module.exports = { 
@@ -55,6 +50,5 @@ module.exports = {
    	joinGame,
    	gameJoinable,
    	leaveGame,
-   	getGames,
-      clearEmptyGames
+   	getGames
 };

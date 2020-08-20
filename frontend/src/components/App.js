@@ -12,9 +12,6 @@ class App extends React.Component{
 					<Route exact path="/">
 						<MainMenu />
 					</Route>
-					<Route exact path="/loading">
-						<Loading />
-					</Route>
 					<Route exact path="/g">
 						<Game />
 					</Route>

@@ -42,16 +42,6 @@ app.post("/api/joinGame", (req,res) => {
 	}
 })
 
-//TODO
-// Clear Empty games and notify users in games in which someone has left
-app.post("/api/declareLeave", (req, res) => {
-	let {username, gameId} = req.body;
-	console.log(username, "has left game", gameId);
-	clearEmptyGames();
-	res.sendStatus(200);
-});
-
-
 //socket handling 
 io.on("connection", socket => {
 	console.log(`${socket.id} has connected`);
@@ -73,14 +63,19 @@ io.on("connection", socket => {
 	   	//join the socket to the game room
 	   	socket.join(user.gameId);
 	   	io.sockets.in(user.gameId).emit("game", user.username + " has entered the game");
+
+	   	if (getGames()[gameId].length === 2) {
+	   		io.sockets.in(user.gameId).emit("gameStart");
+	   	}
 	});
 
-   	socket.on("disconnect", () => {
+   	socket.on("disconnect", (body) => {
+   		console.log(body);
 		//remove user from memory
 	   	console.log("a user has disconnected");
-		let game = userLeave(socket.id);
-	   	leaveGame(game, socket.id);
-
+		let gameid = userLeave(socket.id);
+		io.sockets.in(gameid).emit("forfeit");
+	   	leaveGame(gameid, socket.id);
 	});
 
 });
