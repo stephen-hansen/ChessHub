@@ -7,21 +7,6 @@ class Board extends React.Component {
 
     constructor(props) {
       super(props);
-      this.state = {
-        highlighted: Array(64).fill(false),
-        board: new LibBoard(),
-      }
-    }
-
-    handleClick(row, col) {
-      const moveTos = this.state.board.getValidMoves([row, col]);
-      const highlighted = Array(64).fill(false);
-      for (let i=0; i < moveTos.length; i += 1) {
-        const moveTo = moveTos[i];
-        const num = moveTo[0] * 8 + moveTo[1];
-        highlighted[num] = true;
-      }
-      this.setState({highlighted: highlighted});
     }
     
     renderSquare(i, squareShade, r, c) {
@@ -29,8 +14,8 @@ class Board extends React.Component {
         piece = {this.props.squares[i]} 
         style = {this.props.squares[i]? this.props.squares[i].style : null}
         shade = {squareShade}
-        highlighted = {this.state.highlighted[i] ? "highlighted" : "nun"}
-        onClick={() => this.handleClick(r, c)}
+        highlighted = {this.props.highlighted[i] ? "highlighted" : "nun"}
+        onClick={() => this.props.onClick(r, c)}
         />
     }
 

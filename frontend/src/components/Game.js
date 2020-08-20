@@ -11,6 +11,8 @@ import Pawn from './pieces/pawn.js';
 import Queen from './pieces/queen.js';
 import Rook from './pieces/rook.js';
 
+import { Board as LibBoard } from './chess/board.js';
+
 import io from 'socket.io-client';
 
 
@@ -65,11 +67,13 @@ class Game extends React.Component{
 	constructor() {
 		super();
 		this.params = getParamsFromURL(window.location.href);
+		this.libBoard = new LibBoard();
+		this.selectedPiece = false;
 		this.state = {
 			forfeit: false,
 			ready: false,
 			board: beginningChessBoard(),
-			highlightSquares: [],
+			highlighted: [],
 			whiteDeaths: [],
 			blackDeaths: [],
 			player: null,
@@ -103,22 +107,28 @@ class Game extends React.Component{
 		console.log("Emitted socket joinGame");
 	}
 
-	handleClick(i) {
-		// console.log(i);
-		// this.highlightSquares([i]);
-
-		this.setState({
-			board: this.state.board,
-			highlightSquares: this.state.highlightSquares,
-			whiteDeaths: [],
-			blackDeaths: [],
-			turn: 0
-		});
+	handleClick(row, col) {
+		if (this.selectedPiece) {
+			console.log("Move Piece")
+			const highlighted = Array(64).fill(false);
+			this.setState({highlighted: highlighted});
+		} else {
+			//Select Piece
+			this.handleHighlights(row, col);
+		}
+		this.selectedPiece = !this.selectedPiece;
 	}
 
-	highlightSquares(arrSquares) {
-		this.state.highlightSquares = arrSquares;
-		// console.log(this.state.highlightSquares);
+	handleHighlights(row, col) {
+		const moveTos = this.libBoard.getValidMoves([row, col]);
+		const highlighted = Array(64).fill(false);
+		for (let i=0; i < moveTos.length; i += 1) {
+			const moveTo = moveTos[i];
+			const num = moveTo[0] * 8 + moveTo[1];
+			highlighted[num] = true;
+		}
+		console.log(highlighted);
+		this.setState({highlighted: highlighted});
 	}
 
 	renderGame() {
@@ -128,8 +138,8 @@ class Game extends React.Component{
                 <div className="game-column board">
 	                <Board 
 	                squares = {this.state.board}
-	                highlighted = {this.state.highlightSquares}
-	                onClick = {(i) => this.handleClick(i)}
+	                highlighted = {this.state.highlighted}
+	                onClick = {(r, c) => this.handleClick(r, c)}
 	                />
 	            </div>
 	            <div className="game-column info">
