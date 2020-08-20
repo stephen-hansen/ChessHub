@@ -70,6 +70,11 @@ io.on("connection", socket => {
 		} else {
 			socket.join(gameId);
 			let user = new User(socket.id, username, gameId);
+			/** In case we want to randomize colors
+			*
+            user.color = Math.round(Math.random()) ? "White" : "Black";
+            user.color = (games[gameId].players[Object.keys(games[gameId].players)[0]].color === "White") ? "Black" : "White";
+			**/
 			if (Object.keys(games[gameId].players).length != 1) {
 				user.color = "White";
 				io.to(socket.id).emit("game", "player=White");
