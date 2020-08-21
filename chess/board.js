@@ -410,7 +410,26 @@ class Board {
       }
     }
 
-    return true;
+    // 6. The king is not placed in check
+    // Simulate and test:
+    const k = king.getPosition();
+    const r = rook.getPosition();
+    const kTo = direction === castleLeft ? [row, 2] : [row, 6];
+    const rTo = direction === castleLeft ? [row, 3] : [row, 5];
+    this.setPiece(k, null);
+    this.setPiece(r, null);
+    this.setPiece(kTo, king);
+    this.setPiece(rTo, rook);
+    king.setPosition(kTo);
+    rook.setPosition(rTo);
+    const result = this.isCheck();
+    rook.setPosition(r);
+    king.setPosition(k);
+    this.setPiece(r, rook);
+    this.setPiece(k, king);
+    this.setPiece(rTo, null);
+    this.setPiece(kTo, null);
+    return result;
   }
 
   applyCastle(direction) {
