@@ -18,7 +18,19 @@ class Board {
     this.board = this.loadBoard(this.createPieces());
     this.turn = white;
     this.history = [];
-    this.inactivePieces = [];
+    this.inactiveWhite = [];
+    this.inactiveBlack = [];
+  }
+
+  getRepresentation() {
+    let board = [];
+    this.board.forEach((row, index) => {
+      board.push([]);
+      row.forEach((val) => {
+        board[index].push((val) ? val.getRepresentation() : null);
+      });
+    });
+    return board;
   }
 
   setTurn(player) {
@@ -177,7 +189,11 @@ class Board {
     const pieceAtMove = this.getPiece(toLoc);
     if (pieceAtMove !== null) {
       pieceAtMove.setActive(false);
-      this.inactivePieces.push(pieceAtMove);
+      if (pieceAtMove.getColor() === white) {
+        this.inactiveWhite.push(pieceAtMove);
+      } else {
+        this.inactiveBlack.push(pieceAtMove);
+      }
     }
     this.setPiece(toLoc, piece);
     this.setPiece(fromLoc, null);
@@ -231,7 +247,11 @@ class Board {
           // Remove the piece if player just captured
           this.setPiece(pos, null);
           piece.setActive(false);
-          this.inactivePieces.push(piece);
+          if (piece.getColor() === white) {
+            this.inactiveWhite.push(piece);
+          } else {
+            this.inactiveBlack.push(piece);
+          }
         }
         break; // Only one piece may be en passant at a time.
       }
@@ -431,7 +451,8 @@ class Board {
     // Re-simulate all of the moves
     // Reset board
     this.setTurn(white);
-    this.inactivePieces = [];
+    this.inactiveWhite = [];
+    this.inactiveBlack = [];
     this.board = this.loadBoard(this.createPieces());
     for (let i = 0; i < this.history.length; i += 1) {
       const move = this.history[i];
@@ -442,7 +463,11 @@ class Board {
         const pieceAtMove = this.getPiece(toLoc);
         if (pieceAtMove !== null) {
           pieceAtMove.setActive(false);
-          this.inactivePieces.push(pieceAtMove);
+          if (pieceAtMove.getColor() === white) {
+            this.inactiveWhite.push(pieceAtMove);
+          } else {
+            this.inactiveBlack.push(pieceAtMove);
+          }
         }
         this.setPiece(toLoc, piece);
         this.setPiece(fromLoc, null);

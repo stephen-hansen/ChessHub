@@ -17,10 +17,10 @@ export default class Graveyard extends React.Component {
 	      <div>
 	      <h3>Lost Pieces</h3>
 	      <div className="board-row">{this.props.white.map((p) =>
-	        this.renderSquare(p)
+	        this.renderSquare(p.getRepresentation())
 	        )}</div>
 	      <div className="board-row">{this.props.black.map((p) =>
-	        this.renderSquare(p)
+	        this.renderSquare(p.getRepresentation())
 	        )}</div>
 	      </div>
 	      );
