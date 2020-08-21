@@ -120,6 +120,7 @@ class Game extends React.Component{
 				//set from to be null
 				boardCopy[8*fRow+fCol] = null;
 				this.setState({board:boardCopy});
+        this.setState({turn: !this.state.turn});
 			} else {
 				console.log("move already synced");
 			}
@@ -127,14 +128,24 @@ class Game extends React.Component{
 	}
 
 	handleClick(row, col) {
+    if (this.state.player !== this.libBoard.getTurn()) {
+      return;
+    }
 		if (this.selectedPiece) {
 			console.log("Move Piece")
+      // As an added precaution, i.e. I'm not certain this will ever trigger
+      // But safe to have
+      const sourceP = this.libBoard.getPiece(this.state.currentSource);
+      if (sourceP === null || sourceP.getColor() !== this.state.player) {
+        this.setState({currentSource:[]});
+        this.selectedPiece = !this.selectedPiece;
+        return;
+      }
 			const highlighted = Array(64).fill(false);
 			this.setState({highlighted: highlighted});
 		   	//Destination is row,col
 		   	//Check if destination is valid
-			let sourceP = this.libBoard.getPiece(this.state.currentSource);   	
-		   	let move = new Move(this.state.currentSource, [row,col]);
+		  let move = new Move(this.state.currentSource, [row,col]);
 			if(this.libBoard.applyMove(move)){
 				//move was successfull
 			   	//update state to match libBoard
@@ -146,12 +157,17 @@ class Game extends React.Component{
 				//set current to null
 				boardCopy[8*currentR+currentC] = null;
 				this.setState({board:boardCopy});
+        this.setState({turn: !this.state.turn});
 				//sync the library version of the board alongside the move that just occured
 				this.socket.emit("sync", { move });
 			}
 			this.setState({currentSource:[]});
 		} else {
 			//Select Piece
+      const sourceP = this.libBoard.getPiece([row, col]);
+      if (sourceP === null || sourceP.getColor() !== this.state.player) {
+        return;
+      }
 			this.handleHighlights(row, col);
 		   	this.setState({currentSource: [row,col]})
 		}

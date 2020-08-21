@@ -9,6 +9,7 @@ const port = process.env.PORT || 8080;
 
 const { generate, newGame, joinGame, gameJoinable, leaveGame, getGames, Game } = require("./utils/games.js");
 const { userJoin, userLeave, getUsers, User } = require("./utils/users.js");
+const { white, black } = require("../chess/constants.js");
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -46,7 +47,7 @@ app.post("/api/joinGame", (req,res) => {
 
 let games = {};
 let socketIdsToUsers = {};
-let oppositeColor = (color) => (color === "White") ? "Black" : "White";
+let oppositeColor = (color) => (color === white) ? black : white;
 
 //socket handling 
 io.on("connection", socket => {
@@ -73,15 +74,15 @@ io.on("connection", socket => {
 			let user = new User(socket.id, username, gameId);
 			/** In case we want to randomize colors
 			*
-            user.color = Math.round(Math.random()) ? "White" : "Black";
-            user.color = (games[gameId].players[Object.keys(games[gameId].players)[0]].color === "White") ? "Black" : "White";
+            user.color = Math.round(Math.random()) ? white : black;
+            user.color = (games[gameId].players[Object.keys(games[gameId].players)[0]].color === white) ? black : white;
 			**/
 			if (Object.keys(games[gameId].players).length != 1) {
-				user.color = "White";
-				io.to(socket.id).emit("game", "player=White");
+				user.color = white;
+				io.to(socket.id).emit("game", "player=" + user.color);
 			} else {
-				user.color = "Black";
-				io.to(socket.id).emit("game", "player=Black");
+				user.color = black;
+				io.to(socket.id).emit("game", "player=" + user.color);
 				io.sockets.in(gameId).emit("gameStart", games[gameId].state);
 			}
 			games[gameId].players[username] = user;
