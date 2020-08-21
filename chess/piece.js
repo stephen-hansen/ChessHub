@@ -9,6 +9,11 @@ class Piece {
     this.position = p;
     this.active = true;
     this.moved = false;
+    this.name = 'piece';
+  }
+
+  getRepresentation() {
+    return {string: this.name, color: this.color };
   }
 
   isActive() {

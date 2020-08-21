@@ -1,6 +1,11 @@
 const { Piece } = require('./piece.js');
 
 class Rook extends Piece {
+  constructor(c, p) {
+    super(c, p);
+    this.name = 'rook';
+  }
+
   getMoves(b) {
     let moves = [];
     // Up Vertical

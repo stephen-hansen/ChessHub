@@ -5,6 +5,7 @@ const { black, white } = require('./constants.js');
 class Pawn extends Piece {
   constructor(c, p) {
     super(c, p);
+    this.name = 'pawn';
     this.enPassant = false;
     this.promote = false;
   }

@@ -1,6 +1,11 @@
 const { Piece } = require('./piece.js');
 
 class Queen extends Piece {
+  constructor(c, p) {
+    super(c, p);
+    this.name = 'queen';
+  }
+
   getMoves(b) {
     let moves = [];
     // Up-Right Diag
