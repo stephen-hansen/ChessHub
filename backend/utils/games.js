@@ -9,7 +9,8 @@ class Game {
             moves: []
         };
         this.state = {
-            board: new Board(),
+            board: [],
+            // board: new Board(),
             whiteDeaths: [],
             blackDeaths: [],
             turn: 0
