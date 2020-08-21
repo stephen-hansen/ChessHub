@@ -53,7 +53,7 @@ class Game extends React.Component {
             console.log(msg);
             if (!this.state.player && msg.includes("player=")) {
                 this.setState({
-                    player: (msg.substr(7) === 'w') ? "White" : "Black"
+                    player: msg.substr(7)
                 });
             }
         });
@@ -84,12 +84,14 @@ class Game extends React.Component {
     }
 
     handleClick(row, col) {
-        if (this.state.player !== this.libBoard.getTurn()) {
+        const t = this.libBoard.getTurn();
+        if (this.state.player !== t) {
             this.setState({
                 info: "It is not your turn!"
             });
             return;
         }
+        this.setState({ info: "" });
         if (this.selectedPiece) {
             console.log("Move Piece")
                 // As an added precaution, i.e. I'm not certain this will ever trigger
