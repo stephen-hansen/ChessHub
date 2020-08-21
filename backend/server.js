@@ -99,7 +99,13 @@ io.on("connection", socket => {
 		let gameId = socketIdsToUsers[socket.id].gameId;
 		console.log("syncing gameId: ", gameId);
 		console.log("with move:",move);
-		io.to(gameId).emit("syncBoard", move);
+		io.sockets.in(gameId).emit("syncBoard", move);
+	});
+
+	socket.on("sendMessage", (data) => {
+		//find room to send chat to
+		let gameId = socketIdsToUsers[socket.id].gameId;
+		io.sockets.in(gameId).emit("newMessage", data);
 	});
 
    	socket.on("disconnect", (body) => {

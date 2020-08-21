@@ -84,3 +84,15 @@ button{
   float: left;
   width: 50%;
 }
+
+.gamePage {
+  height: 100vh;
+  position: relative;
+}
+
+.chat {
+  position: absolute;
+  max-height: 200px;
+  width: 100vw;
+  bottom: 0;
+}

@@ -2,14 +2,11 @@ import React from 'react';
 import './App.css';
 import Board from './Board.js';
 import GameInfo from './GameInfo.js';
+import Chat from './Chat.js';
 import Loading from './Loading.js';
 
-import {
-    Board as LibBoard
-} from './chess/board.js';
-import {
-    Move
-} from './chess/move.js';
+import { Board as LibBoard } from './chess/board.js';
+import { Move } from './chess/move.js';
 
 import io from 'socket.io-client';
 
@@ -186,7 +183,15 @@ class Game extends React.Component {
             <h3 > {
                 this.state.info
             } </h3> 
-			</div> </div>
+			</div> 
+			<div className="chat">
+				<Chat
+					username={this.params.username}
+					socket={this.socket}
+				/>
+				</div>
+
+		</div>
         );
     }
 
