@@ -16,7 +16,7 @@ class Pawn extends Piece {
     const newRow = this.getPosition()[0];
     // If move was a double, enable En Passant
     if (Math.abs(newRow - prevRow) === 2) {
-      this.enPassant = true;
+      this.enPassant = !this.enPassant;
     }
     if (this.getColor() === white && newRow === 0) {
       this.promote = true;
