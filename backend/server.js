@@ -102,6 +102,17 @@ io.on("connection", socket => {
 		io.sockets.in(gameId).emit("syncBoard", move);
 	});
 
+  socket.on("syncCastle", (move) => {
+		//find room that socket that needs to be synced
+		//1. apply move to the chesslib.Board
+		//1.5 add history to game on server
+		//2. send signal with move
+		let gameId = socketIdsToUsers[socket.id].gameId;
+		console.log("syncing gameId: ", gameId);
+		console.log("with castle:",move);
+		io.sockets.in(gameId).emit("syncCastleBoard", move);
+	});
+
 	socket.on("sendMessage", (data) => {
 		//find room to send chat to
 		let gameId = socketIdsToUsers[socket.id].gameId;

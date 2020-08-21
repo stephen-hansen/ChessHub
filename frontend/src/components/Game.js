@@ -4,9 +4,11 @@ import Board from './Board.js';
 import GameInfo from './GameInfo.js';
 import Chat from './Chat.js';
 import Loading from './Loading.js';
+import CastleMenu from './CastleMenu.js';
 
 import { Board as LibBoard } from './chess/board.js';
 import { Move } from './chess/move.js';
+import { castleLeft, castleRight } from './chess/constants.js';
 
 import io from 'socket.io-client';
 
@@ -72,6 +74,11 @@ class Game extends React.Component {
         });
         this.socket.on("syncBoard", (move) => {
             let deserializedMove = new Move(move.from, move.to);
+            const piece = this.libBoard.getPiece(move.from);
+            if (piece === null || piece.getColor() === this.state.player) {
+               console.log("move already synced");
+               return;
+            }
             if (this.libBoard.applyMove(deserializedMove)) {
                 this.setState({
                     board: this.libBoard.getRepresentation(),
@@ -81,7 +88,43 @@ class Game extends React.Component {
                 console.log("move already synced");
             }
         });
+        this.socket.on("syncCastleBoard", (move) => {
+            const color = move.color;
+            const dir = move.direction;
+            if (color === this.state.player) {
+              console.log("move already synced");
+              return;
+            }
+            if (this.libBoard.applyCastle(dir)) {
+                this.setState({
+                    board: this.libBoard.getRepresentation(),
+                    turn: !this.state.turn
+                });
+            } else {
+                console.log("move already synced");
+            }
+        });
     }
+
+  handleCastle(direction) {
+    const t = this.libBoard.getTurn();
+    if (this.state.player !== t) {
+      this.setState({
+        info: "It is not your turn!"
+      });
+      return;
+    }
+    this.setState({ info: "" });
+    console.log("Castle" + direction)
+    if (this.libBoard.applyCastle(direction)) {
+      this.setState({
+        board: this.libBoard.getRepresentation(),
+        turn: !this.state.turn
+      });
+      //sync the library version of the board alongside the move that just occured
+      this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
+    }
+  }
 
     handleClick(row, col) {
         const t = this.libBoard.getTurn();
@@ -165,8 +208,18 @@ class Game extends React.Component {
             onClick = {
                 (r, c) => this.handleClick(r, c)
             }
-            /> 
-			</div> <div className = "game-column info" >
+            />
+			</div> 
+          <div className = "game-column castleMenu" >
+             <CastleMenu leftClick = {
+               () => this.handleCastle(castleLeft)
+             }
+             rightClick = {
+               () => this.handleCastle(castleRight)
+             }
+             />
+          </div>
+          <div className = "game-column info" >
             <GameInfo player = {
                 this.state.player
             }
