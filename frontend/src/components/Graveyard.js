@@ -1,12 +1,14 @@
 import React from 'react';
 import Square from './Square.js';
 import './App.css';
+import getIconUrl from './imageUrls.js';
 
 export default class Graveyard extends React.Component {
-	renderSquare(square, i, squareShade) {
-	    return <Square 
-	    piece = {square} 
-	    style = {square.style}
+	renderSquare(p) {
+	    return <Square
+      piece = {p.string}
+      style = {{backgroundImage: "url('" + getIconUrl(p.string, p.color) +  "')"}}
+      highlighted = {"nun"}
 	    />
   	}
 
@@ -14,11 +16,11 @@ export default class Graveyard extends React.Component {
 	    return (
 	      <div>
 	      <h3>Lost Pieces</h3>
-	      <div className="board-row">{this.props.white.map((ws, index) =>
-	        this.renderSquare(ws, index)
+	      <div className="board-row">{this.props.white.map((p) =>
+	        this.renderSquare(p)
 	        )}</div>
-	      <div className="board-row">{this.props.black.map((bs, index) =>
-	        this.renderSquare(bs, index)
+	      <div className="board-row">{this.props.black.map((p) =>
+	        this.renderSquare(p)
 	        )}</div>
 	      </div>
 	      );
