@@ -2,14 +2,16 @@ import React from 'react';
 import Square from './Square.js';
 import { Board as LibBoard } from './chess/board.js';
 import './App.css';
+import getIconUrl from './imageUrls.js';
 
 class Board extends React.Component {
 
     renderSquare(i, squareShade, r, c) {
+        let piece = this.props.squares[r][c];
         return <Square 
 	   	key	  = {i}
-        piece = {this.props.squares[i]} 
-        style = {this.props.squares[i]? this.props.squares[i].style : null}
+        piece = {(piece) ? piece.string : ""} 
+        style = {(piece) ? {backgroundImage: "url('" + getIconUrl(piece.string, piece.color) +  "')"} : null}
         shade = {squareShade}
         highlighted = {this.props.highlighted[i] ? "highlighted" : "nun"}
         onClick={() => this.props.onClick(r, c)}

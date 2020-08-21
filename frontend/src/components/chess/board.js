@@ -21,6 +21,17 @@ class Board {
     this.inactivePieces = [];
   }
 
+  getRepresentation() {
+    let board = [];
+    this.board.forEach((row, index) => {
+        board.push([]);
+        row.forEach((val) => {
+            board[index].push((val) ? val.getRepresentation() : null);
+        });
+    });
+    return board;
+  }
+
   setTurn(player) {
     this.turn = player;
   }
