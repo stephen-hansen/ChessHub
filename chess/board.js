@@ -429,7 +429,7 @@ class Board {
     this.setPiece(k, king);
     this.setPiece(rTo, null);
     this.setPiece(kTo, null);
-    return result;
+    return !result;
   }
 
   applyCastle(direction) {
