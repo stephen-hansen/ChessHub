@@ -18,6 +18,7 @@ class Board {
     this.board = this.loadBoard(this.createPieces());
     this.turn = white;
     this.history = [];
+    this.inactivePieces = [];
   }
 
   setTurn(player) {
@@ -176,6 +177,7 @@ class Board {
     const pieceAtMove = this.getPiece(toLoc);
     if (pieceAtMove !== null) {
       pieceAtMove.setActive(false);
+      this.inactivePieces.push(pieceAtMove);
     }
     this.setPiece(toLoc, piece);
     this.setPiece(fromLoc, null);
@@ -218,9 +220,9 @@ class Board {
         piece.disableEnPassant();
         let captureSpot = null;
         if (piece.getColor() === white) {
-          captureSpot = this.getPiece([row - 1, col]);
-        } else {
           captureSpot = this.getPiece([row + 1, col]);
+        } else {
+          captureSpot = this.getPiece([row - 1, col]);
         }
         // Check if the player put a pawn in capture spot
         if (captureSpot !== null
@@ -229,6 +231,7 @@ class Board {
           // Remove the piece if player just captured
           this.setPiece(pos, null);
           piece.setActive(false);
+          this.inactivePieces.push(piece);
         }
         break; // Only one piece may be en passant at a time.
       }
@@ -428,6 +431,7 @@ class Board {
     // Re-simulate all of the moves
     // Reset board
     this.setTurn(white);
+    this.inactivePieces = [];
     this.board = this.loadBoard(this.createPieces());
     for (let i = 0; i < this.history.length; i += 1) {
       const move = this.history[i];
@@ -438,6 +442,7 @@ class Board {
         const pieceAtMove = this.getPiece(toLoc);
         if (pieceAtMove !== null) {
           pieceAtMove.setActive(false);
+          this.inactivePieces.push(pieceAtMove);
         }
         this.setPiece(toLoc, piece);
         this.setPiece(fromLoc, null);

@@ -5,8 +5,9 @@ const { black, white } = require('./constants.js');
 class Pawn extends Piece {
   constructor(c, p) {
     super(c, p);
+    this.name = 'pawn';
     this.enPassant = false;
-    this.canPromote = false;
+    this.promote = false;
   }
 
   setPosition(p) {
@@ -18,10 +19,10 @@ class Pawn extends Piece {
       this.enPassant = true;
     }
     if (this.getColor() === white && newRow === 0) {
-      this.canPromote = true;
+      this.promote = true;
     }
     if (this.getColor() === black && newRow === 7) {
-      this.canPromote = true;
+      this.promote = true;
     }
   }
 
@@ -31,6 +32,10 @@ class Pawn extends Piece {
 
   isEnPassant() {
     return this.enPassant;
+  }
+
+  canPromote() {
+    return this.promote;
   }
 
   getMoves(b) {
