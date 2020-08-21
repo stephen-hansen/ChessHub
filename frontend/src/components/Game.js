@@ -153,26 +153,22 @@ class Game extends React.Component {
     }
 
     renderGame() {
-        return ( <
-            div className = "gamePage" >
-            <
-            h1 > ChessHub Game Page < /h1> <
-            div className = "game-column board" >
-            <
-            Board squares = {
-                this.state.board
-            }
+        return ( 
+		<div className = "gamePage" >
+            <div class="header">
+				<h1>ChessHub</h1>
+			</div> 
+			<div className = "game-column board" >
+            <Board squares = {this.state.board}
             highlighted = {
                 this.state.highlighted
             }
             onClick = {
                 (r, c) => this.handleClick(r, c)
             }
-            /> <
-            /div> <
-            div className = "game-column info" >
-            <
-            GameInfo player = {
+            /> 
+			</div> <div className = "game-column info" >
+            <GameInfo player = {
                 this.state.player
             }
             turn = {
@@ -184,15 +180,13 @@ class Game extends React.Component {
             black = {
                 this.state.blackDeaths
             }
-            /> <
-            /div> <
-            div className = "lower-info" >
-            <
-            h3 > {
+            /> 
+			</div> 
+			<div className = "lower-info" >
+            <h3 > {
                 this.state.info
-            } < /h3> <
-            /div> <
-            /div>
+            } </h3> 
+			</div> </div>
         );
     }
 
