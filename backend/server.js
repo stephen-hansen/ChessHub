@@ -60,12 +60,13 @@ io.on("connection", socket => {
 		} else if (Object.keys(games[gameId].players).length >= 2 &&
 			!Object.keys(games[gameId].players).includes(username)) {
 			io.to(socket.id).emit("gameFull");
-		} else if (Object.keys(games[gameId].players).includes(username)) {
+		} //reconnect
+		else if (Object.keys(games[gameId].players).includes(username)) {
 			let user = games[gameId].players[username];
 			user.connected = true;
 			user.socketId = socket.id;
 			io.to(socket.id).emit("game", `player=${user.color}`);
-			io.to(socket.id).emit("gameStart");
+			io.to(socket.id).emit("gameStart", games[gameId].state);
 			socketIdsToUsers[socket.id] = gameId;
 		} else {
 			socket.join(gameId);
@@ -81,7 +82,7 @@ io.on("connection", socket => {
 			} else {
 				user.color = "Black";
 				io.to(socket.id).emit("game", "player=Black");
-				io.sockets.in(gameId).emit("gameStart");
+				io.sockets.in(gameId).emit("gameStart", games[gameId].state);
 			}
 			games[gameId].players[username] = user;
 			socketIdsToUsers[socket.id] = user;
@@ -89,27 +90,34 @@ io.on("connection", socket => {
 		console.log(games);
 	});
 
+	socket.on("sync", ({move}) => {
+		//find room that socket that needs to be synced
+		//1. apply move to the chesslib.Board
+		//1.5 add history to game on server
+		//2. send signal with move
+		let gameId = socketIdsToUsers[socket.id].gameId;
+		console.log("syncing gameId: ", gameId);
+		console.log("with move:",move);
+		io.to(gameId).emit("syncBoard", move);
+	});
+
    	socket.on("disconnect", (body) => {
-   		console.log(body);
 	   	console.log("a user has disconnected");
 		let user = socketIdsToUsers[socket.id];
 		if (user && games[user.gameId]) {
 			io.sockets.in(user.gameId).emit("forfeit");
 			user.connected = false;
-
 			let keys = Object.keys(games[user.gameId].players);
 			if (keys.length === 1 || 
 				(!games[user.gameId].players[keys[0]].connected && 
 				!games[user.gameId].players[keys[1]].connected)) {
 				delete games[user.gameId];
 			}
-
 			delete socketIdsToUsers[socket.id];
 		}
 	});
 
 });
-
 
 http.listen(port, () => {
 	console.log("listening on port *: " + port);

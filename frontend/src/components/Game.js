@@ -1,5 +1,4 @@
 import React from 'react';
-// import './App.css';
 import './App.css';
 import Board from './Board.js';
 import GameInfo from './GameInfo.js';
@@ -12,6 +11,7 @@ import Queen from './pieces/queen.js';
 import Rook from './pieces/rook.js';
 
 import { Board as LibBoard } from './chess/board.js';
+import { Move } from './chess/move.js';
 
 import io from 'socket.io-client';
 
@@ -78,7 +78,8 @@ class Game extends React.Component{
 			blackDeaths: [],
 			player: null,
 			turn: 0,
-			info: ""
+			info: "",
+		   	currentSource: []
 		}
 	}
 
@@ -99,12 +100,30 @@ class Game extends React.Component{
 			});
 			console.log("Your opponent has left");
 		});
-		this.socket.on("gameStart", () => {
+		this.socket.on("gameStart", (state) => {
+			//function to convert chesslib board to react state
 			this.setState({
 				ready: true
+				//board: this.convert(state.board);
 			});
 		});
-		console.log("Emitted socket joinGame");
+		this.socket.on("syncBoard", (move) => {
+			let deserializedMove = new Move(move.from, move.to);
+			if(this.libBoard.applyMove(deserializedMove)){
+				let tRow = deserializedMove.getTo()[0];
+				let tCol = deserializedMove.getTo()[1];
+				let fRow = deserializedMove.getFrom()[0];
+				let fCol = deserializedMove.getFrom()[1];
+				let boardCopy = JSON.parse(JSON.stringify(this.state.board));
+				//set destination to be new piece
+				boardCopy[8*tRow+tCol] = boardCopy[8*fRow+fCol];
+				//set from to be null
+				boardCopy[8*fRow+fCol] = null;
+				this.setState({board:boardCopy});
+			} else {
+				console.log("move already synced");
+			}
+		});
 	}
 
 	handleClick(row, col) {
@@ -112,9 +131,29 @@ class Game extends React.Component{
 			console.log("Move Piece")
 			const highlighted = Array(64).fill(false);
 			this.setState({highlighted: highlighted});
+		   	//Destination is row,col
+		   	//Check if destination is valid
+			let sourceP = this.libBoard.getPiece(this.state.currentSource);   	
+		   	let move = new Move(this.state.currentSource, [row,col]);
+			if(this.libBoard.applyMove(move)){
+				//move was successfull
+			   	//update state to match libBoard
+				let currentR = this.state.currentSource[0];
+				let currentC = this.state.currentSource[1];
+				let boardCopy = JSON.parse(JSON.stringify(this.state.board));
+				//set destination to be new piece
+				boardCopy[8*row+col] = boardCopy[8*currentR+currentC];
+				//set current to null
+				boardCopy[8*currentR+currentC] = null;
+				this.setState({board:boardCopy});
+				//sync the library version of the board alongside the move that just occured
+				this.socket.emit("sync", { move });
+			}
+			this.setState({currentSource:[]});
 		} else {
 			//Select Piece
 			this.handleHighlights(row, col);
+		   	this.setState({currentSource: [row,col]})
 		}
 		this.selectedPiece = !this.selectedPiece;
 	}
@@ -127,7 +166,6 @@ class Game extends React.Component{
 			const num = moveTo[0] * 8 + moveTo[1];
 			highlighted[num] = true;
 		}
-		console.log(highlighted);
 		this.setState({highlighted: highlighted});
 	}
 
@@ -165,7 +203,7 @@ class Game extends React.Component{
 	}
 
     render(){
-    	let {ready, forfeit} = this.state;
+    	let {ready} = this.state;
         if (ready)
         	return this.renderGame();
         else {

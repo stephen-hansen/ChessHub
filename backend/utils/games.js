@@ -1,3 +1,5 @@
+const { Board } = '../../../chess/board.js';
+
 class Game {
     constructor(gameId) {
         this.id = gameId;
@@ -7,7 +9,7 @@ class Game {
             moves: []
         };
         this.state = {
-            board: [],
+            board: new Board(),
             whiteDeaths: [],
             blackDeaths: [],
             turn: 0
@@ -22,7 +24,7 @@ let games = {};
 //      generated twice
 //generate a short ID for a game
 function generate(count) {
-    let abc = "bcdefghijklmnopqrstuvwxyz1234567890";
+    let abc = "abcdefghijklmnopqrstuvwxyz1234567890";
     let str = "";
     for (let i = 0; i < count; i++) {
         str += abc[parseInt(Math.random() * abc.length)];

@@ -2,11 +2,7 @@ import React from 'react';
 import './App.css';
 
 class Loading extends React.Component {
-    constructor() {
-        super();
-    }
-
-    render() {
+   render() {
         return (
             <div className="mainPage">
             <h1> Waiting for opponent... </h1>
