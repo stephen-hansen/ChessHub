@@ -172,7 +172,9 @@ class Game extends React.Component{
 	renderGame() {
 		return (
             <div className="gamePage">
-                <h1> ChessHub Game Page </h1>
+				<div class="header">
+					<h1>ChessHub</h1>
+				</div>
                 <div className="game-column board">
 	                <Board 
 	                squares = {this.state.board}

@@ -7,7 +7,9 @@ class MainMenu extends React.Component {
     render() {
         return (
             <div className="mainPage">
-            <h1> ChessHub </h1>
+                <div class="header">
+                    <h1> ChessHub </h1>
+                </div>
             <h3> Please create a game or join a game</h3>
                 <label id="username-label" required>Username</label><br />
                 <input type="text" id="username" name="username" /> <br />

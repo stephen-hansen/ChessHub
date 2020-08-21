@@ -75,3 +75,18 @@ button{
   float: left;
   width: 50%;
 }
+
+.header {
+  border-radius: 10px;
+  text-align: center;
+  background: #7694AB;
+  color: white;
+  font-size: 46px;
+  font-family: "Candara";
+}
+
+.gameinfo {
+  border-radius: 10px;
+  font: #76977D;
+  font-size: 36px;
+}
