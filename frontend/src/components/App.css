@@ -35,6 +35,16 @@ td {
   border-left: none;
 }
 
+.castleMenu {
+  position: relative;
+  margin-left: 10px;
+}
+
+.info {
+  position: absolute;
+  right: 0;
+}
+
 input {
   width: 50%;
   padding: 12px 20px;
@@ -102,7 +112,15 @@ button{
 .highlighted {
   border: 1px solid black;
   background-color:khaki;
-} 
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
 
 .header {
   border-radius: 10px;

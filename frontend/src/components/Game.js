@@ -41,6 +41,8 @@ class Game extends React.Component {
             board: this.libBoard.getRepresentation(),
             history: this.libBoard.getSANHistory(),
             highlighted: [],
+            leftCastleVisible: "hidden",
+            rightCastleVisible: "hidden",
             whiteDeaths: this.libBoard.inactiveWhite,
             blackDeaths: this.libBoard.inactiveBlack,
             player: null,
@@ -118,7 +120,9 @@ class Game extends React.Component {
     this.setState({
       history: this.libBoard.getSANHistory(),
       board: this.libBoard.getRepresentation(),
-      turn: !this.state.turn
+      turn: !this.state.turn,
+      leftCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleLeft)) ? "visible" : "hidden",
+      rightCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleRight)) ? "visible" : "hidden",
     });
   }
 
@@ -225,9 +229,12 @@ class Game extends React.Component {
             />
 			</div> 
           <div className = "game-column castleMenu" >
-             <CastleMenu leftClick = {
+             <CastleMenu 
+             leftVisible = {this.state.leftCastleVisible}
+             leftClick = {
                () => this.handleCastle(castleLeft)
              }
+             rightVisible = {this.state.rightCastleVisible}
              rightClick = {
                () => this.handleCastle(castleRight)
              }
