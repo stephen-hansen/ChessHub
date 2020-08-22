@@ -5,9 +5,9 @@ export default class MoveHistory extends React.Component {
 	renderTable() {
 	    return this.props.history.map((move, i) => {
         if (i % 2) {
-          return (<tr><td>Black</td><td>{ move }</td></tr>);
+          return (<tr key={i}><td>Black</td><td>{ move }</td></tr>);
         } else {
-          return(<tr><td>White</td><td>{ move }</td></tr>);
+          return(<tr key={i}><td>White</td><td>{ move }</td></tr>);
         }
       });
   	}

@@ -117,6 +117,8 @@ class Game extends React.Component {
     }
 
   synchronize() {
+    const audio = new Audio("./audio/move.mp3");
+    audio.play();
     this.setState({
       history: this.libBoard.getSANHistory(),
       board: this.libBoard.getRepresentation(),
