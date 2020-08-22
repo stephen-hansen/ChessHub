@@ -7,7 +7,7 @@ import { white } from './chess/constants.js';
 class GameInfo extends React.Component {
 	render() {
 		return (
-			<div>
+			<div className="gameInfo">
 			<h2>Playing as: {this.props.player === white ? "White" : "Black"}</h2>
 			<h2>Current turn: {this.props.turn ? "Black" : "White"}</h2>
 			<Graveyard

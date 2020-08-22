@@ -106,8 +106,8 @@ io.on("connection", socket => {
 			//sync the board with everyone in the room
 			io.sockets.in(gameId).emit("syncBoard", move);
       if (board.isCheckmate()) {
-        console.log("Checkmate for", board.getTurn());
-        io.sockets.in(gameId).emit("checkmate", (board.getTurn()));
+        console.log("Win by checkmate:", board.getOpponent());
+        io.sockets.in(gameId).emit("checkmate", (board.getOpponent()));
       } else if (board.isStalemate()) {
         console.log("Stalemate for", board.getTurn());
         io.sockets.in(gameId).emit("stalemate", (board.getTurn()));
@@ -132,6 +132,20 @@ io.on("connection", socket => {
 			console.log("castle move was invalid");
 		}
 	});
+
+  socket.on("undo", (data) => {
+    let gameId = socketIdsToUsers[socket.id].gameId;
+    io.sockets.in(gameId).emit("answerUndo", data);
+  });
+
+  socket.on("respondToUndo", (data) => {
+    let gameId = socketIdsToUsers[socket.id].gameId;
+    if (data.confirm) {
+      let board = games[gameId].state.board;
+      board.undo(2);
+    }
+    io.sockets.in(gameId).emit("syncUndo", data);
+  });
 
 	socket.on("sendMessage", (data) => {
 		//find room to send chat to

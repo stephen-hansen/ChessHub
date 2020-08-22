@@ -5,6 +5,7 @@ import GameInfo from './GameInfo.js';
 import Chat from './Chat.js';
 import Loading from './Loading.js';
 import CastleMenu from './CastleMenu.js';
+import UndoMenu from './UndoMenu.js';
 
 import { Board as LibBoard } from './chess/board.js';
 import { Move } from './chess/move.js';
@@ -36,6 +37,8 @@ class Game extends React.Component {
         this.selectedPiece = false;
         this.state = {
             forfeit: false,
+            mayUndo: true,
+            hasPlayed: false,
 			locked: false,
             ready: false,
             board: this.libBoard.getRepresentation(),
@@ -43,6 +46,8 @@ class Game extends React.Component {
             highlighted: [],
             leftCastleVisible: "hidden",
             rightCastleVisible: "hidden",
+            startUndoVisible: "hidden",
+            respondUndoVisible: "hidden",
             whiteDeaths: this.libBoard.inactiveWhite,
             blackDeaths: this.libBoard.inactiveBlack,
             player: null,
@@ -105,29 +110,123 @@ class Game extends React.Component {
             }
         });
 		this.socket.on("checkmate", (data) => {
+      const name = data === white ? "White" : "Black";
 			this.setState({
-				info: "Checkmate for " + data + "!",
-				locked: true
+				info: name + " wins by checkmate!",
+				locked: true,
+        mayUndo: false,
+        startUndoVisible: "hidden",
 			});
 		});
  		this.socket.on("stalemate", (data) => {
-			this.setState({
-				info: "Stalemate for " + data + "!",
-				locked: true
+			const name = data === white ? "White" : "Black";
+      this.setState({
+				info: "Draw! " + name + " is stalemated.",
+				locked: true,
+        mayUndo: false,
+        startUndoVisible: "hidden",
 			});
 		});
-    }
+    this.socket.on("syncUndo", (data) => {
+      if (!data.confirm) {
+        this.setState({
+          info: "Undo rejected.",
+          locked: false,
+          mayUndo: false,
+          startUndoVisible: "hidden",
+        });
+        return;
+      }
+      const highlighted = Array(64).fill(false);
+				this.setState({
+					highlighted: highlighted
+				});
+      this.libBoard.undo(2);
+      this.synchronize();
+      const moves = this.libBoard.getHistory();
+      if (moves.length !== 0) {
+        const recentMove = moves[moves.length - 1];
+        if (recentMove.getCastleSide() !== null) {
+          this.highlightCastle(this.libBoard.getOpponent(), recentMove.getCastleSide());
+        } else {
+          this.highlightMove(recentMove);
+        }
+      } else {
+        this.setState({
+          hasPlayed: false,
+        });
+      }
+      this.setState({
+        info: "Undo confirmed.",
+        locked: false,
+        turn: !this.state.turn,
+      });
+    });
+    this.socket.on("answerUndo", (data) => {
+      const color = data.color;
+      if (color === this.state.player) {
+        return;
+      }
+      this.setState({
+        locked: true,
+        respondUndoVisible: "visible",
+      });
+    });
+  }
 
   synchronize() {
     const audio = new Audio("./audio/move.mp3");
     audio.play();
+    const mayUndo = (this.libBoard.getTurn() === this.state.player
+      && this.state.hasPlayed && this.state.mayUndo);
     this.setState({
       history: this.libBoard.getSANHistory(),
       board: this.libBoard.getRepresentation(),
       turn: !this.state.turn,
       leftCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleLeft)) ? "visible" : "hidden",
       rightCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleRight)) ? "visible" : "hidden",
+      startUndoVisible: mayUndo ? "visible" : "hidden",
+      respondUndoVisible: "hidden",
     });
+  }
+
+  initiateUndo() {
+    if(!this.state.locked){
+			const t = this.libBoard.getTurn();
+			if (this.state.player !== t) {
+				this.setState({
+					info: "It is not your turn!"
+				});
+				return;
+			}
+      if (!this.state.hasPlayed) {
+        this.setState({
+          info: "No move available to undo!"
+        });
+        return;
+      }
+      if (!this.state.mayUndo) {
+        this.setState({
+          info: "No more available undos!"
+        });
+        return;
+      }
+
+		  this.socket.emit("undo", { color: this.state.player });
+		  this.setState({
+        info: "Waiting on response from opponent...",
+        startUndoVisible: "hidden",
+        locked: true,
+        mayUndo: false,
+      });
+    }
+  }
+
+  respondToUndo(answer) {
+    this.setState({
+        respondUndoVisible: "hidden",
+    });
+    this.socket.emit("respondToUndo", { confirm: answer });
   }
 
 	handleCastle(direction) {
@@ -185,6 +284,9 @@ class Game extends React.Component {
 					this.socket.emit("sync", {
 						move
 					});
+          this.setState({
+            hasPlayed: true,
+          });
           this.highlightMove(move);
           this.selectedPiece = !this.selectedPiece;
 				} else {
@@ -280,6 +382,21 @@ class Game extends React.Component {
              rightVisible = {this.state.rightCastleVisible}
              rightClick = {
                () => this.handleCastle(castleRight)
+             }
+             />
+          </div>
+          <div className = "game-column undoMenu" >
+             <UndoMenu
+             startVisible = {this.state.startUndoVisible}
+             respondVisible = {this.state.respondUndoVisible}
+             initiateUndo = {
+               () => this.initiateUndo()
+             }
+             confirmUndo = {
+               () => this.respondToUndo(true)
+             }
+             declineUndo = {
+               () => this.respondToUndo(false)
              }
              />
           </div>

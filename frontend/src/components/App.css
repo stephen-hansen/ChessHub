@@ -36,8 +36,20 @@ td {
 }
 
 .castleMenu {
-  position: relative;
+  position: absolute;
+  top: 300px;
+  left: 200px;
+}
+
+.undoMenu {
+  position: absolute;
+  top: 300px;
   margin-left: 10px;
+}
+
+.respond {
+  position: relative;
+  top: -200px;
 }
 
 .info {
@@ -70,7 +82,7 @@ button{
   color: white;
   padding: 15px 32px;
   text-align: center;
-  font-size: 30px;
+  font-size: 16px;
   border-radius: 10px;
   align-items: center;
   margin: 40px 0;
