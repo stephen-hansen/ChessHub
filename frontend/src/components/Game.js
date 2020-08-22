@@ -107,7 +107,13 @@ class Game extends React.Component {
         });
 		this.socket.on("checkmate", (data) => {
 			this.setState({
-				info: "Checkmate for " + data.winner + "!",
+				info: "Checkmate for " + data + "!",
+				locked: true
+			});
+		});
+ 		this.socket.on("stalemate", (data) => {
+			this.setState({
+				info: "Stalemate for " + data + "!",
 				locked: true
 			});
 		});
@@ -131,12 +137,6 @@ class Game extends React.Component {
 				});
 				//sync the library version of the board alongside the move that just occured
 				this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
-
-				if(this.libBoard.isCheckmate()){
-					console.log("checkmate");
-					this.setState({locked:true});
-					this.socket.emit("checkmate", {winner: this.params.username});
-				}
 			}
 		}
 	}
@@ -179,12 +179,6 @@ class Game extends React.Component {
 					this.socket.emit("sync", {
 						move
 					});
-
-					if(this.libBoard.isCheckmate()){
-						console.log("checkmate");
-						this.setState({locked:true});
-						this.socket.emit("checkmate", {winner: this.params.username});
-					}
 				}
 				this.setState({
 					currentSource: []

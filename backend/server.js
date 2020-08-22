@@ -105,6 +105,13 @@ io.on("connection", socket => {
 			console.log("with move:",move);
 			//sync the board with everyone in the room
 			io.sockets.in(gameId).emit("syncBoard", move);
+      if (board.isCheckmate()) {
+        console.log("Checkmate for", board.getTurn());
+        io.sockets.in(gameId).emit("checkmate", (board.getTurn()));
+      } else if (board.isStalemate()) {
+        console.log("Stalemate for", board.getTurn());
+        io.sockets.in(gameId).emit("stalemate", (board.getTurn()));
+      }
 		} else {
 			console.log("move is invalid");
 		}
@@ -124,12 +131,6 @@ io.on("connection", socket => {
 		} else {
 			console.log("castle move was invalid");
 		}
-	});
-
-	socket.on("checkmate", (data) => {
-		let gameId = socketIdsToUsers[socket.id].gameId;
-		console.log(data, "wins", gameId);
-		io.sockets.in(gameId).emit("checkmate", (data));
 	});
 
 	socket.on("sendMessage", (data) => {
