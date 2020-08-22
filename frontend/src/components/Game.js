@@ -8,7 +8,7 @@ import CastleMenu from './CastleMenu.js';
 
 import { Board as LibBoard } from './chess/board.js';
 import { Move } from './chess/move.js';
-import { castleLeft, castleRight } from './chess/constants.js';
+import { white, castleLeft, castleRight } from './chess/constants.js';
 
 import io from 'socket.io-client';
 
@@ -99,6 +99,7 @@ class Game extends React.Component {
             }
             if (this.libBoard.applyCastle(dir)) {
               this.synchronize();
+              this.highlightCastle(this.libBoard.getOpponent(), dir);
             } else {
                 console.log("move already synced");
             }
@@ -144,7 +145,8 @@ class Game extends React.Component {
 				this.synchronize();
 				//sync the library version of the board alongside the move that just occured
 				this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
-			}
+        this.highlightCastle(this.state.player, direction);
+      }
 		}
 	}
 
@@ -213,7 +215,21 @@ class Game extends React.Component {
         this.selectedPiece = !this.selectedPiece;
 			}
 		}
-	}
+    }
+
+  highlightCastle(color, direction) {
+    const highlighted = Array(64).fill(false);
+    const row = color === white ? 7 : 0;
+    const dir = direction === castleLeft ? -1 : 1;
+
+    for (let i = 0; i < 3; i += 1) {
+      const square = 8*row + 4 + dir*i; 
+      highlighted[square] = true;
+    }
+    this.setState({
+      highlighted: highlighted
+    });
+  }
 
   highlightMove(move) {
     const highlighted = Array(64).fill(false);
