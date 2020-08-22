@@ -85,6 +85,7 @@ class Game extends React.Component {
             }
             if (this.libBoard.applyMove(deserializedMove)) {
                 this.synchronize();
+                this.highlightMove(deserializedMove);
             } else {
                 console.log("move already synced");
             }
@@ -182,10 +183,23 @@ class Game extends React.Component {
 					this.socket.emit("sync", {
 						move
 					});
-				}
-				this.setState({
-					currentSource: []
-				});
+          this.highlightMove(move);
+          this.selectedPiece = !this.selectedPiece;
+				} else {
+          // If user selects a different piece, set it to be current
+          const pieceAtClick = this.libBoard.getPiece([row, col]);
+          if (pieceAtClick !== null && pieceAtClick.getColor() === this.state.player) {
+            this.setState({
+              currentSource: [row, col]
+            });
+            this.handleHighlights(row, col);
+          } else {
+            this.setState({
+              currentSource: []
+            });
+            this.selectedPiece = !this.selectedPiece;
+          }
+        }
 			} else {
 				//Select Piece
 				const sourceP = this.libBoard.getPiece([row, col]);
@@ -196,10 +210,21 @@ class Game extends React.Component {
 				this.setState({
 					currentSource: [row, col]
 				})
+        this.selectedPiece = !this.selectedPiece;
 			}
-			this.selectedPiece = !this.selectedPiece;
 		}
 	}
+
+  highlightMove(move) {
+    const highlighted = Array(64).fill(false);
+    const from = move.getFrom();
+    highlighted[from[0] * 8 + from[1]] = true;
+    const to = move.getTo();
+    highlighted[to[0] * 8 + to[1]] = true;
+    this.setState({
+      highlighted: highlighted
+    });
+  }
 
     handleHighlights(row, col) {
         const moveTos = this.libBoard.getValidMoves([row, col]);
