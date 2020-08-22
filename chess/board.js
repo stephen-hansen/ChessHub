@@ -8,6 +8,10 @@ const {
   promoteKnight,
   promoteBishop,
   promoteQueen,
+  moveStandard,
+  moveCastle,
+  movePromotion,
+  moveDraw,
 } = require('./constants.js');
 const { Bishop } = require('./bishop.js');
 const { King } = require('./king.js');
@@ -24,6 +28,14 @@ class Board {
     this.history = [];
     this.inactiveWhite = [];
     this.inactiveBlack = [];
+  }
+
+  getSANHistory() {
+    const hist = [];
+    this.history.forEach((move) => {
+      hist.push(move.getSAN());
+    });
+    return hist;
   }
 
   getRepresentation() {
@@ -180,6 +192,44 @@ class Board {
     return moveTos;
   }
 
+  includeRankOrFile(move) {
+    const pieces = this.getPieces();
+    const from = move.getFrom();
+    const to = move.getTo();
+    const pieceAtMove = this.getPiece(from);
+    let match = null;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = pieces[i];
+      const newFrom = piece.getPosition();
+      if (piece.getName() === pieceAtMove.getName()
+        && piece.getColor() === pieceAtMove.getColor()
+        && (from[0] !== newFrom[0] || from[1] !== newFrom[1])) {
+        const loc = piece.getPosition();
+        const moveTos = this.getValidMoves(loc);
+        for (let j = 0; j < moveTos.length; j += 1) {
+          if (moveTos[j][0] === to[0] && moveTos[j][1] === to[1]) {
+            match = piece;
+            break;
+          }
+        }
+        if (match !== null) {
+          break;
+        }
+      }
+    }
+    if (match === null) {
+      return move;
+    }
+    // Found two identical pieces with same move to
+    // If cols are equal, use rank, otherwise use file to differentiate
+    if (match.getPosition()[1] === pieceAtMove.getPosition()[1]) {
+      move.setDepRank();
+    } else {
+      move.setDepFile();
+    }
+    return move;
+  }
+
   applyMove(move) {
     const toLoc = move.getTo();
     const fromLoc = move.getFrom();
@@ -191,6 +241,10 @@ class Board {
       return false;
     }
     const pieceAtMove = this.getPiece(toLoc);
+    // Check if any identical pieces can make same move
+    let detailedMove = this.includeRankOrFile(move);
+    detailedMove.setPieceAbbreviation(piece.getAbbreviation());
+    // Capture
     if (pieceAtMove !== null) {
       pieceAtMove.setActive(false);
       if (pieceAtMove.getColor() === white) {
@@ -198,15 +252,23 @@ class Board {
       } else {
         this.inactiveBlack.push(pieceAtMove);
       }
+      detailedMove.setCapture();
+      // Pawns must always include file of departure in capture
+      if (piece.getName() === 'pawn') {
+        detailedMove.setDepFile();
+      }
     }
     this.setPiece(toLoc, piece);
     this.setPiece(fromLoc, null);
     piece.setPosition(toLoc);
     piece.setMoved();
-    this.history.push(move);
     // Verify en Passant if it occurs
-    this.enPassant();
+    if (this.enPassant()) {
+      detailedMove.setEnPassant();
+    }
     this.setTurn(this.getOpponent());
+    detailedMove = this.updateMove(move);
+    this.history.push(detailedMove);
     return true;
   }
 
@@ -256,10 +318,12 @@ class Board {
           } else {
             this.inactiveBlack.push(piece);
           }
+          return true;
         }
         break; // Only one piece may be en passant at a time.
       }
     }
+    return false;
   }
 
   isPromotion() {
@@ -457,10 +521,14 @@ class Board {
       // Record move
       king.setMoved();
       rook.setMoved();
-      this.history.push(direction);
+      let move = new Move(null, null);
+      move.setType(moveCastle);
+      move.setCastleSide(direction);
       // Verify en Passant if it occurs (disable it for opponent)
       this.enPassant();
       this.setTurn(this.getOpponent());
+      move = this.updateMove(move);
+      this.history.push(move);
     }
     return result;
   }
@@ -500,13 +568,31 @@ class Board {
     }
     newPiece.setMoved(); // To prevent movement based cases
     this.setPiece(loc, newPiece); // Add the piece in
-    this.history.push(promoteType);
+    const move = this.history[this.history.length - 1];
+    move.setType(movePromotion);
+    move.setPromotion(promoteType);
     toPromote.setActive(false);
     if (toPromote.getColor() === white) {
       this.inactiveWhite.push(toPromote);
     } else {
       this.inactiveBlack.push(toPromote);
     }
+    this.history[this.history.length - 1] = this.updateMove(move);
+    return true;
+  }
+
+  updateMove(move) {
+    if (this.isCheckmate()) {
+      move.setCheckmate();
+    } else if (this.isCheck()) {
+      move.setCheck();
+    }
+    return move;
+  }
+
+  applyDraw() {
+    const move = new Move(null, null);
+    move.setType(moveDraw);
     return true;
   }
 
@@ -525,12 +611,15 @@ class Board {
     this.board = this.loadBoard(this.createPieces());
     for (let i = 0; i < hist.length; i += 1) {
       const move = hist[i];
-      if (move instanceof Move) {
+      if (move.getType() === moveStandard) {
         this.applyMove(move);
-      } else if (move === castleLeft || move === castleRight) {
-        this.applyCastle(move);
-      } else {
-        this.applyPromotion(move);
+      } else if (move.getType() === moveCastle) {
+        this.applyCastle(move.getCastleSide());
+      } else if (move.getType() === movePromotion) {
+        this.applyMove(move);
+        this.applyPromotion(move.getPromotion());
+      } else if (move.getType() === moveDraw) {
+        this.applyDraw();
       }
     }
 
