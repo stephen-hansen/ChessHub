@@ -36,6 +36,7 @@ class Game extends React.Component {
         this.selectedPiece = false;
         this.state = {
             forfeit: false,
+			locked: false,
             ready: false,
             board: this.libBoard.getRepresentation(),
             highlighted: [],
@@ -104,82 +105,104 @@ class Game extends React.Component {
                 console.log("move already synced");
             }
         });
+		this.socket.on("checkmate", (data) => {
+			this.setState({
+				info: "Checkmate for " + data.winner + "!",
+				locked: true
+			});
+		});
     }
 
-  handleCastle(direction) {
-    const t = this.libBoard.getTurn();
-    if (this.state.player !== t) {
-      this.setState({
-        info: "It is not your turn!"
-      });
-      return;
-    }
-    this.setState({ info: "" });
-    console.log("Castle" + direction)
-    if (this.libBoard.applyCastle(direction)) {
-      this.setState({
-        board: this.libBoard.getRepresentation(),
-        turn: !this.state.turn
-      });
-      //sync the library version of the board alongside the move that just occured
-      this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
-    }
-  }
+	handleCastle(direction) {
+		if(!this.state.locked){
+			const t = this.libBoard.getTurn();
+			if (this.state.player !== t) {
+				this.setState({
+					info: "It is not your turn!"
+				});
+				return;
+			}
+			this.setState({ info: "" });
+			console.log("Castle" + direction)
+			if (this.libBoard.applyCastle(direction)) {
+				this.setState({
+					board: this.libBoard.getRepresentation(),
+					turn: !this.state.turn
+				});
+				//sync the library version of the board alongside the move that just occured
+				this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
+
+				if(this.libBoard.isCheckmate()){
+					console.log("checkmate");
+					this.setState({locked:true});
+					this.socket.emit("checkmate", {winner: this.params.username});
+				}
+			}
+		}
+	}
 
     handleClick(row, col) {
-        const t = this.libBoard.getTurn();
-        if (this.state.player !== t) {
-            this.setState({
-                info: "It is not your turn!"
-            });
-            return;
-        }
-        this.setState({ info: "" });
-        if (this.selectedPiece) {
-            console.log("Move Piece")
-                // As an added precaution, i.e. I'm not certain this will ever trigger
-                // But safe to have
-            const sourceP = this.libBoard.getPiece(this.state.currentSource);
-            if (sourceP === null || sourceP.getColor() !== this.state.player) {
-                this.setState({
-                    currentSource: []
-                });
-                this.selectedPiece = !this.selectedPiece;
-                return;
-            }
-            const highlighted = Array(64).fill(false);
-            this.setState({
-                highlighted: highlighted
-            });
-            //Destination is row,col
-            //Check if destination is valid
-            let move = new Move(this.state.currentSource, [row, col]);
-            if (this.libBoard.applyMove(move)) {
-                this.setState({
-                    board: this.libBoard.getRepresentation(),
-                    turn: !this.state.turn
-                });
-                //sync the library version of the board alongside the move that just occured
-                this.socket.emit("sync", {
-                    move
-                });
-            }
-            this.setState({
-                currentSource: []
-            });
-        } else {
-            //Select Piece
-            const sourceP = this.libBoard.getPiece([row, col]);
-            if (sourceP === null || sourceP.getColor() !== this.state.player) {
-                return;
-            }
-            this.handleHighlights(row, col);
-            this.setState({
-                currentSource: [row, col]
-            })
-        }
-        this.selectedPiece = !this.selectedPiece;
-    }
+		if(!this.state.locked){
+			const t = this.libBoard.getTurn();
+			if (this.state.player !== t) {
+				this.setState({
+					info: "It is not your turn!"
+				});
+				return;
+			}
+			this.setState({ info: "" });
+			if (this.selectedPiece) {
+				console.log("Move Piece")
+					// As an added precaution, i.e. I'm not certain this will ever trigger
+					// But safe to have
+				const sourceP = this.libBoard.getPiece(this.state.currentSource);
+				if (sourceP === null || sourceP.getColor() !== this.state.player) {
+					this.setState({
+						currentSource: []
+					});
+					this.selectedPiece = !this.selectedPiece;
+					return;
+				}
+				const highlighted = Array(64).fill(false);
+				this.setState({
+					highlighted: highlighted
+				});
+				//Destination is row,col
+				//Check if destination is valid
+				let move = new Move(this.state.currentSource, [row, col]);
+				if (this.libBoard.applyMove(move)) {
+					this.setState({
+						board: this.libBoard.getRepresentation(),
+						turn: !this.state.turn
+					});
+					//sync the library version of the board alongside the move that just occured
+					this.socket.emit("sync", {
+						move
+					});
+
+					if(this.libBoard.isCheckmate()){
+						console.log("checkmate");
+						this.setState({locked:true});
+						this.socket.emit("checkmate", {winner: this.params.username});
+					}
+				}
+				this.setState({
+					currentSource: []
+				});
+			} else {
+				//Select Piece
+				const sourceP = this.libBoard.getPiece([row, col]);
+				if (sourceP === null || sourceP.getColor() !== this.state.player) {
+					return;
+				}
+				this.handleHighlights(row, col);
+				this.setState({
+					currentSource: [row, col]
+				})
+			}
+			this.selectedPiece = !this.selectedPiece;
+		}
+	}
 
     handleHighlights(row, col) {
         const moveTos = this.libBoard.getValidMoves([row, col]);
@@ -197,7 +220,7 @@ class Game extends React.Component {
     renderGame() {
         return ( 
 		<div className = "gamePage" >
-            <div class="header">
+            <div className="header">
 				<h1>ChessHub</h1>
 			</div> 
 			<div className = "game-column board" >

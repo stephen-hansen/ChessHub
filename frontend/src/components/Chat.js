@@ -29,7 +29,7 @@ class Chat extends React.Component{
 
 	enterPressed(e){
 		let code = e.keyCode || e.which;
-		if(code == 13){
+		if(code === 13){
 			this.sendMessage(e);
 		}
 	}

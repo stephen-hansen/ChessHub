@@ -7,9 +7,10 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const port = process.env.PORT || 8080;
 
-const { generate, newGame, joinGame, gameJoinable, leaveGame, getGames, Game } = require("./utils/games.js");
+const { generate, Game } = require("./utils/games.js");
 const { userJoin, userLeave, getUsers, User } = require("./utils/users.js");
 const { white, black } = require("../chess/constants.js");
+const { Move } = require("../chess/move.js");
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -93,13 +94,20 @@ io.on("connection", socket => {
 
 	socket.on("sync", ({move}) => {
 		//find room that socket that needs to be synced
-		//1. apply move to the chesslib.Board
-		//1.5 add history to game on server
-		//2. send signal with move
 		let gameId = socketIdsToUsers[socket.id].gameId;
-		console.log("syncing gameId: ", gameId);
-		console.log("with move:",move);
-		io.sockets.in(gameId).emit("syncBoard", move);
+		let board = games[gameId].state.board;
+		let nMove = new Move(move.from, move.to);
+		console.log("validating move:", nMove);
+		//apply move to server representation of board	
+        if (board.applyMove(nMove)) {
+			console.log("move is valid");
+			console.log("syncing gameId: ", gameId);
+			console.log("with move:",move);
+			//sync the board with everyone in the room
+			io.sockets.in(gameId).emit("syncBoard", move);
+		} else {
+			console.log("move is invalid");
+		}
 	});
 
   socket.on("syncCastle", (move) => {
@@ -108,9 +116,21 @@ io.on("connection", socket => {
 		//1.5 add history to game on server
 		//2. send signal with move
 		let gameId = socketIdsToUsers[socket.id].gameId;
-		console.log("syncing gameId: ", gameId);
-		console.log("with castle:",move);
-		io.sockets.in(gameId).emit("syncCastleBoard", move);
+	  	let board = games[gameId].state.board;
+	  	let nMove = new Move(move.from, move.to);
+	  	if (board.applyMove(nMove)) {
+			console.log("syncing gameId: ", gameId);
+			console.log("with castle:", move);
+			io.sockets.in(gameId).emit("syncCastleBoard", move);
+		} else {
+			console.log("castle move was invalid");
+		}
+	});
+
+	socket.on("checkmate", (data) => {
+		let gameId = socketIdsToUsers[socket.id].gameId;
+		console.log(data, "wins", gameId);
+		io.sockets.in(gameId).emit("checkmate", (data));
 	});
 
 	socket.on("sendMessage", (data) => {

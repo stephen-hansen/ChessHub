@@ -1,6 +1,5 @@
 import React from 'react';
 import Square from './Square.js';
-import { Board as LibBoard } from './chess/board.js';
 import './App.css';
 import getIconUrl from './imageUrls.js';
 
