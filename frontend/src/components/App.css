@@ -1,3 +1,40 @@
+table {
+  width: 100%;
+}
+
+table, td {
+  border-collapse: collapse;
+}
+
+thead {
+  display: table;
+  width: calc(100% - 17px);
+}
+
+tbody {
+  display: block;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+th, td {
+  width: 33.33%;
+  padding: 5px;
+  word-break: break-all;
+}
+
+tr {
+  display: table;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+td {
+  text-align: center;
+  border-bottom: none;
+  border-left: none;
+}
+
 input {
   width: 50%;
   padding: 12px 20px;
@@ -12,7 +49,7 @@ input {
 
 body{
     font-family: "Candara";
-    font-size: 30px;
+    font-size: 18px;
     background-color: #c4ced4;
     color: #333333;
     text-align: center;
@@ -72,7 +109,7 @@ button{
   text-align: center;
   background: #7694AB;
   color: white;
-  font-size: 46px;
+  font-size: 30px;
   font-family: "Candara";
 }
 

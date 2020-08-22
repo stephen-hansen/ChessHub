@@ -4,6 +4,7 @@ class Bishop extends Piece {
   constructor(c, p) {
     super(c, p);
     this.name = 'bishop';
+    this.abbreviation = 'B';
   }
 
   getMoves(b) {

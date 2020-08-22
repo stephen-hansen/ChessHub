@@ -645,3 +645,234 @@ test('get valid moves', () => {
   expect(board.getValidMoves([0, 0]).length).toBe(0);
   expect(board.getValidMoves([4, 4]).length).toBe(0);
 });
+
+test('SAN history', () => {
+  // The famous Bobby Fischer game
+  // See https://www.chess.com/games/view/75289
+  const board = new Board();
+
+  expect(board.applyMove(new Move([7, 6], [5, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 6], [2, 5]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([6, 2], [4, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 6], [2, 6]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 1], [5, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 5], [1, 6]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([6, 3], [4, 3]))).toBeTruthy();
+  expect(board.applyCastle(castleRight)).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 2], [4, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 3], [3, 3]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 3], [5, 1]))).toBeTruthy();
+  expect(board.applyMove(new Move([3, 3], [4, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([5, 1], [4, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 2], [2, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([6, 4], [4, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 1], [1, 3]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 0], [7, 3]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 3], [2, 1]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([4, 2], [3, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 2], [4, 6]))).toBeTruthy();
+
+  // 10 turns in
+
+  expect(board.applyMove(new Move([4, 5], [3, 6]))).toBeTruthy();
+  expect(board.applyMove(new Move([2, 1], [4, 0]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([3, 2], [5, 0]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 0], [5, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([6, 1], [5, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([2, 5], [4, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([3, 6], [1, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 3], [2, 1]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 5], [4, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 4], [5, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([1, 4], [3, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 5], [0, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 4], [7, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 6], [2, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([3, 2], [2, 1]))).toBeTruthy();
+  expect(board.applyMove(new Move([2, 4], [4, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 5], [7, 6]))).toBeTruthy();
+  expect(board.applyMove(new Move([5, 2], [6, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 6], [7, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([6, 4], [4, 3]))).toBeTruthy();
+
+  // 20 turns in
+
+  expect(board.applyMove(new Move([7, 5], [7, 6]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 3], [6, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 6], [7, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([6, 4], [5, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 5], [7, 6]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 0], [2, 1]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([5, 0], [4, 1]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 0], [4, 0]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([4, 1], [2, 1]))).toBeTruthy();
+  expect(board.applyMove(new Move([5, 2], [7, 3]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([6, 7], [5, 7]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 0], [6, 0]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 6], [6, 7]))).toBeTruthy();
+  expect(board.applyMove(new Move([7, 3], [6, 5]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 7], [7, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 4], [7, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([2, 1], [0, 3]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 6], [0, 5]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([5, 5], [7, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 2], [3, 3]))).toBeTruthy();
+
+  // 30 turns in
+
+  expect(board.applyMove(new Move([7, 4], [5, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([6, 5], [4, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([0, 3], [0, 1]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 1], [3, 1]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([5, 7], [4, 7]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 7], [3, 7]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([5, 5], [3, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 6], [1, 6]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([6, 7], [7, 6]))).toBeTruthy();
+  expect(board.applyMove(new Move([0, 5], [3, 2]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 6], [7, 5]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 4], [5, 6]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 5], [7, 4]))).toBeTruthy();
+  expect(board.applyMove(new Move([3, 2], [4, 1]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 4], [7, 3]))).toBeTruthy();
+  expect(board.applyMove(new Move([3, 3], [5, 1]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 3], [7, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([5, 6], [6, 4]))).toBeTruthy();
+
+  expect(board.applyMove(new Move([7, 2], [7, 1]))).toBeTruthy();
+  expect(board.applyMove(new Move([6, 4], [5, 2]))).toBeTruthy();
+
+  // Final move
+  expect(board.applyMove(new Move([7, 1], [7, 2]))).toBeTruthy();
+  expect(board.applyMove(new Move([6, 0], [6, 2]))).toBeTruthy();
+
+  // Okay, now to test the SAN move notation
+
+  const expected = [
+    'Nf3',
+    'Nf6',
+    'c4',
+    'g6',
+    'Nc3',
+    'Bg7',
+    'd4',
+    '0-0',
+    'Bf4',
+    'd5',
+    'Qb3',
+    'dxc4',
+    'Qxc4',
+    'c6',
+    'e4',
+    'Nbd7',
+    'Rd1',
+    'Nb6',
+    'Qc5',
+    'Bg4',
+    'Bg5',
+    'Na4',
+    'Qa3',
+    'Nxc3',
+    'bxc3',
+    'Nxe4',
+    'Bxe7',
+    'Qb6',
+    'Bc4',
+    'Nxc3',
+    'Bc5',
+    'Rfe8+',
+    'Kf1',
+    'Be6',
+    'Bxb6',
+    'Bxc4+',
+    'Kg1',
+    'Ne2+',
+    'Kf1',
+    'Nxd4+',
+    'Kg1',
+    'Ne2+',
+    'Kf1',
+    'Nc3+',
+    'Kg1',
+    'axb6',
+    'Qb4',
+    'Ra4',
+    'Qxb6',
+    'Nxd1',
+    'h3',
+    'Rxa2',
+    'Kh2',
+    'Nxf2',
+    'Re1',
+    'Rxe1',
+    'Qd8+',
+    'Bf8',
+    'Nxe1',
+    'Bd5',
+    'Nf3',
+    'Ne4',
+    'Qb8',
+    'b5',
+    'h4',
+    'h5',
+    'Ne5',
+    'Kg7',
+    'Kg1',
+    'Bc5+',
+    'Kf1',
+    'Ng3+',
+    'Ke1',
+    'Bb4+',
+    'Kd1',
+    'Bb3+',
+    'Kc1',
+    'Ne2+',
+    'Kb1',
+    'Nc3+',
+    'Kc1',
+    'Rc2#',
+  ];
+
+  const actual = board.getSANHistory();
+
+  for (let i = 0; i < expected.length; i += 1) {
+    expect(actual[i]).toBe(expected[i]);
+  }
+
+  expect(expected.length).toBe(actual.length);
+});

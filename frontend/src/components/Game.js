@@ -39,6 +39,7 @@ class Game extends React.Component {
 			locked: false,
             ready: false,
             board: this.libBoard.getRepresentation(),
+            history: this.libBoard.getSANHistory(),
             highlighted: [],
             whiteDeaths: this.libBoard.inactiveWhite,
             blackDeaths: this.libBoard.inactiveBlack,
@@ -81,10 +82,7 @@ class Game extends React.Component {
                return;
             }
             if (this.libBoard.applyMove(deserializedMove)) {
-                this.setState({
-                    board: this.libBoard.getRepresentation(),
-                    turn: !this.state.turn
-                });
+                this.synchronize();
             } else {
                 console.log("move already synced");
             }
@@ -97,10 +95,7 @@ class Game extends React.Component {
               return;
             }
             if (this.libBoard.applyCastle(dir)) {
-                this.setState({
-                    board: this.libBoard.getRepresentation(),
-                    turn: !this.state.turn
-                });
+              this.synchronize();
             } else {
                 console.log("move already synced");
             }
@@ -119,6 +114,14 @@ class Game extends React.Component {
 		});
     }
 
+  synchronize() {
+    this.setState({
+      history: this.libBoard.getSANHistory(),
+      board: this.libBoard.getRepresentation(),
+      turn: !this.state.turn
+    });
+  }
+
 	handleCastle(direction) {
 		if(!this.state.locked){
 			const t = this.libBoard.getTurn();
@@ -131,10 +134,7 @@ class Game extends React.Component {
 			this.setState({ info: "" });
 			console.log("Castle" + direction)
 			if (this.libBoard.applyCastle(direction)) {
-				this.setState({
-					board: this.libBoard.getRepresentation(),
-					turn: !this.state.turn
-				});
+				this.synchronize();
 				//sync the library version of the board alongside the move that just occured
 				this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
 			}
@@ -171,10 +171,7 @@ class Game extends React.Component {
 				//Check if destination is valid
 				let move = new Move(this.state.currentSource, [row, col]);
 				if (this.libBoard.applyMove(move)) {
-					this.setState({
-						board: this.libBoard.getRepresentation(),
-						turn: !this.state.turn
-					});
+					this.synchronize();
 					//sync the library version of the board alongside the move that just occured
 					this.socket.emit("sync", {
 						move
@@ -248,6 +245,9 @@ class Game extends React.Component {
             }
             black = {
                 this.state.blackDeaths
+            }
+            history = {
+                this.state.history
             }
             /> 
 			</div> 

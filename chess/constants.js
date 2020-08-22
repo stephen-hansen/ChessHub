@@ -6,6 +6,10 @@ const promoteKnight = 'knight';
 const promoteBishop = 'bishop';
 const castleLeft = 'left';
 const castleRight = 'right';
+const moveStandard = 'standard';
+const moveCastle = 'castle';
+const movePromotion = 'promotion';
+const moveDraw = 'draw';
 
 module.exports = {
   white,
@@ -16,4 +20,8 @@ module.exports = {
   promoteBishop,
   castleLeft,
   castleRight,
+  moveStandard,
+  moveCastle,
+  movePromotion,
+  moveDraw,
 };

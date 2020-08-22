@@ -10,6 +10,15 @@ class Piece {
     this.active = true;
     this.moved = false;
     this.name = 'piece';
+    this.abbreviation = '';
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  getAbbreviation() {
+    return this.abbreviation;
   }
 
   getRepresentation() {

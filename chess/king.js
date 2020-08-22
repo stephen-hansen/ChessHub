@@ -4,6 +4,7 @@ class King extends Piece {
   constructor(c, p) {
     super(c, p);
     this.name = 'king';
+    this.abbreviation = 'K';
   }
 
   getMoves(b) {

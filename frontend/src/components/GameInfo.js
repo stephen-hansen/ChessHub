@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import Graveyard from './Graveyard.js';
+import MoveHistory from './MoveHistory.js';
 import { white } from './chess/constants.js';
 
 class GameInfo extends React.Component {
@@ -13,6 +14,9 @@ class GameInfo extends React.Component {
 			white={this.props.white}
 			black={this.props.black}
 			/>
+      <MoveHistory
+      history={this.props.history}
+      />
 			</div>
 		);
 	}

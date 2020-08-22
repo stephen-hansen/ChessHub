@@ -4,6 +4,7 @@ class Knight extends Piece {
   constructor(c, p) {
     super(c, p);
     this.name = 'knight';
+    this.abbreviation = 'N';
   }
 
   getMoves(b) {

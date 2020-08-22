@@ -4,6 +4,7 @@ class Rook extends Piece {
   constructor(c, p) {
     super(c, p);
     this.name = 'rook';
+    this.abbreviation = 'R';
   }
 
   getMoves(b) {
