@@ -117,8 +117,7 @@ io.on("connection", socket => {
 		//2. send signal with move
 		let gameId = socketIdsToUsers[socket.id].gameId;
 	  	let board = games[gameId].state.board;
-	  	let nMove = new Move(move.from, move.to);
-	  	if (board.applyMove(nMove)) {
+	  	if (board.applyCastle(move.direction)) {
 			console.log("syncing gameId: ", gameId);
 			console.log("with castle:", move);
 			io.sockets.in(gameId).emit("syncCastleBoard", move);
