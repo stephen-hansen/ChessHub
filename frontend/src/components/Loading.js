@@ -5,7 +5,7 @@ class Loading extends React.Component {
    render() {
         return (
             <div className="mainPage">
-                <div class="header">
+                <div className="header">
                      <h1> ChessHub </h1>
                  </div>
             <h1> Waiting for opponent... </h1>
