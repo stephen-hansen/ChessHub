@@ -4,6 +4,10 @@ const {
   white,
   castleLeft,
   castleRight,
+  promoteRook,
+  promoteKnight,
+  promoteBishop,
+  promoteQueen,
 } = require('./constants.js');
 const { Bishop } = require('./bishop.js');
 const { King } = require('./king.js');
@@ -23,7 +27,7 @@ class Board {
   }
 
   getRepresentation() {
-    let board = [];
+    const board = [];
     this.board.forEach((row, index) => {
       board.push([]);
       row.forEach((val) => {
@@ -461,6 +465,50 @@ class Board {
     return result;
   }
 
+  applyPromotion(promoteType) {
+    const pieces = this.getPieces();
+    let toPromote = null;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = pieces[i];
+      if (piece instanceof Pawn && piece.canPromote()) {
+        toPromote = piece;
+        break;
+      }
+    }
+    if (toPromote === null) {
+      return false;
+    }
+
+    const loc = toPromote.getPosition();
+    const color = toPromote.getColor();
+    let newPiece = null;
+    switch (promoteType) {
+      case promoteQueen:
+        newPiece = new Queen(color, loc);
+        break;
+      case promoteKnight:
+        newPiece = new Knight(color, loc);
+        break;
+      case promoteRook:
+        newPiece = new Rook(color, loc);
+        break;
+      case promoteBishop:
+        newPiece = new Bishop(color, loc);
+        break;
+      default:
+        return false;
+    }
+    newPiece.setMoved(); // To prevent movement based cases
+    this.setPiece(loc, newPiece); // Add the piece in
+    toPromote.setActive(false);
+    if (toPromote.getColor() === white) {
+      this.inactiveWhite.push(toPromote);
+    } else {
+      this.inactiveBlack.push(toPromote);
+    }
+    return true;
+  }
+
   undo(numMoves) {
     const hist = this.getHistory();
     if (numMoves > hist.length) {
@@ -517,10 +565,6 @@ class Board {
 
     return true;
   }
-
-  // TODO
-  // check promotion and en passant ONLY after a pawn move
-  // implement promotion
 }
 
 module.exports = { Board };
