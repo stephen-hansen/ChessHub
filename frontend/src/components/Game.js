@@ -143,6 +143,10 @@ class Game extends React.Component {
 				});
       this.libBoard.undo(2);
       this.synchronize();
+      this.setState({
+        whiteDeaths: this.libBoard.inactiveWhite,
+        blackDeaths: this.libBoard.inactiveBlack,
+      });
       const moves = this.libBoard.getHistory();
       if (moves.length !== 0) {
         const recentMove = moves[moves.length - 1];
