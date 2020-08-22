@@ -523,8 +523,8 @@ class Board {
     this.inactiveBlack = [];
     this.history = [];
     this.board = this.loadBoard(this.createPieces());
-    for (let i = 0; i < this.history.length; i += 1) {
-      const move = this.history[i];
+    for (let i = 0; i < hist.length; i += 1) {
+      const move = hist[i];
       if (move instanceof Move) {
         this.applyMove(move);
       } else if (move === castleLeft || move === castleRight) {
