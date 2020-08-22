@@ -500,6 +500,7 @@ class Board {
     }
     newPiece.setMoved(); // To prevent movement based cases
     this.setPiece(loc, newPiece); // Add the piece in
+    this.history.push(promoteType);
     toPromote.setActive(false);
     if (toPromote.getColor() === white) {
       this.inactiveWhite.push(toPromote);
@@ -510,57 +511,27 @@ class Board {
   }
 
   undo(numMoves) {
-    const hist = this.getHistory();
+    let hist = this.getHistory();
     if (numMoves > hist.length) {
       return false;
     }
-    this.history = hist.slice(0, hist.length - numMoves);
+    hist = hist.slice(0, hist.length - numMoves);
     // Re-simulate all of the moves
     // Reset board
     this.setTurn(white);
     this.inactiveWhite = [];
     this.inactiveBlack = [];
+    this.history = [];
     this.board = this.loadBoard(this.createPieces());
     for (let i = 0; i < this.history.length; i += 1) {
       const move = this.history[i];
       if (move instanceof Move) {
-        const toLoc = move.getTo();
-        const fromLoc = move.getFrom();
-        const piece = this.getPiece(fromLoc);
-        const pieceAtMove = this.getPiece(toLoc);
-        if (pieceAtMove !== null) {
-          pieceAtMove.setActive(false);
-          if (pieceAtMove.getColor() === white) {
-            this.inactiveWhite.push(pieceAtMove);
-          } else {
-            this.inactiveBlack.push(pieceAtMove);
-          }
-        }
-        this.setPiece(toLoc, piece);
-        this.setPiece(fromLoc, null);
-        piece.setPosition(toLoc);
-        piece.setMoved();
+        this.applyMove(move);
       } else if (move === castleLeft || move === castleRight) {
-        const direction = move;
-        const row = this.getTurn() === white ? 7 : 0;
-        const rookCol = direction === castleLeft ? 0 : 7;
-        const king = this.getPiece([row, 4]);
-        const rook = this.getPiece([row, rookCol]);
-        const k = king.getPosition();
-        const r = rook.getPosition();
-        const kTo = direction === castleLeft ? [row, 2] : [row, 6];
-        const rTo = direction === castleLeft ? [row, 3] : [row, 5];
-        this.setPiece(k, null);
-        this.setPiece(r, null);
-        this.setPiece(kTo, king);
-        this.setPiece(rTo, rook);
-        king.setPosition(kTo);
-        king.setMoved();
-        rook.setPosition(rTo);
-        rook.setMoved();
+        this.applyCastle(move);
+      } else {
+        this.applyPromotion(move);
       }
-      this.enPassant();
-      this.setTurn(this.getOpponent());
     }
 
     return true;
