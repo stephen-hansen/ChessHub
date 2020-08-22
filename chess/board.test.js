@@ -12,6 +12,10 @@ const {
   white,
   castleLeft,
   castleRight,
+  promoteQueen,
+  promoteKnight,
+  promoteRook,
+  promoteBishop,
 } = require('./constants.js');
 
 test('board initializes to default board layout', () => {
@@ -381,17 +385,66 @@ test('pawn promotion', () => {
   board.setBoard([new King(white, [7, 7]),
     new King(black, [0, 0]),
     pawn]);
+  expect(board.isPromotion()).toBeFalsy();
+  expect(board.applyPromotion(promoteQueen)).toBeFalsy();
   expect(board.applyMove(new Move([1, 7], [0, 7]))).toBeTruthy();
   expect(pawn.canPromote()).toBeTruthy();
+  expect(board.isPromotion()).toBeTruthy();
+  expect(board.applyPromotion('foobar')).toBeFalsy();
+  expect(board.applyPromotion(promoteQueen)).toBeTruthy();
+  expect(pawn.isActive()).toBeFalsy();
+  let newPiece = board.getPiece([0, 7]);
+  expect(newPiece).toBeInstanceOf(Queen);
+  expect(newPiece.getColor()).toBe(white);
+  pawn = new Pawn(white, [1, 7]);
+  board.setBoard([new King(white, [7, 7]),
+    new King(black, [0, 0]),
+    pawn]);
+  board.setTurn(white);
+  expect(board.isPromotion()).toBeFalsy();
+  expect(board.applyPromotion(promoteBishop)).toBeFalsy();
+  expect(board.applyMove(new Move([1, 7], [0, 7]))).toBeTruthy();
+  expect(pawn.canPromote()).toBeTruthy();
+  expect(board.isPromotion()).toBeTruthy();
+  expect(board.applyPromotion('foobar')).toBeFalsy();
+  expect(board.applyPromotion(promoteBishop)).toBeTruthy();
+  expect(pawn.isActive()).toBeFalsy();
+  newPiece = board.getPiece([0, 7]);
+  expect(newPiece).toBeInstanceOf(Bishop);
+  expect(newPiece.getColor()).toBe(white);
   // Test black pawn promote
   pawn = new Pawn(black, [6, 0]);
   board.setBoard([new King(white, [7, 7]),
     new King(black, [0, 0]),
     pawn]);
   board.setTurn(black);
+  expect(board.isPromotion()).toBeFalsy();
+  expect(board.applyPromotion(promoteQueen)).toBeFalsy();
   expect(board.applyMove(new Move([6, 0], [7, 0]))).toBeTruthy();
   expect(pawn.canPromote()).toBeTruthy();
-  // TODO add the promotion code to board
+  expect(board.isPromotion()).toBeTruthy();
+  expect(board.applyPromotion('foobar')).toBeFalsy();
+  expect(board.applyPromotion(promoteKnight)).toBeTruthy();
+  expect(pawn.isActive()).toBeFalsy();
+  newPiece = board.getPiece([7, 0]);
+  expect(newPiece).toBeInstanceOf(Knight);
+  expect(newPiece.getColor()).toBe(black);
+  pawn = new Pawn(black, [6, 0]);
+  board.setBoard([new King(white, [7, 7]),
+    new King(black, [0, 0]),
+    pawn]);
+  board.setTurn(black);
+  expect(board.isPromotion()).toBeFalsy();
+  expect(board.applyPromotion(promoteQueen)).toBeFalsy();
+  expect(board.applyMove(new Move([6, 0], [7, 0]))).toBeTruthy();
+  expect(pawn.canPromote()).toBeTruthy();
+  expect(board.isPromotion()).toBeTruthy();
+  expect(board.applyPromotion('foobar')).toBeFalsy();
+  expect(board.applyPromotion(promoteRook)).toBeTruthy();
+  expect(pawn.isActive()).toBeFalsy();
+  newPiece = board.getPiece([7, 0]);
+  expect(newPiece).toBeInstanceOf(Rook);
+  expect(newPiece.getColor()).toBe(black);
 });
 
 test('initial pawn move', () => {
@@ -568,4 +621,27 @@ test('undo moves', () => {
   expect(JSON.stringify(board.getBoard())).toStrictEqual(state2);
   // Do not undo 100 moves, would be errorneous
   expect(board.undo(100)).toBeFalsy();
+});
+
+test('get board representation', () => {
+  const board = new Board();
+  const rep = board.getRepresentation();
+  expect(rep.length).toBe(8);
+  for (let i = 0; i < 8; i += 1) {
+    expect(rep[i].length).toBe(8);
+  }
+});
+
+test('get valid moves', () => {
+  const board = new Board();
+  for (let i = 0; i < 8; i += 1) {
+    expect(board.getValidMoves([1, i]).length).toBe(2);
+  }
+  for (let i = 0; i < 8; i += 1) {
+    expect(board.getValidMoves([6, i]).length).toBe(2);
+  }
+  expect(board.getValidMoves([0, 1]).length).toBe(2);
+  expect(board.getValidMoves([0, 6]).length).toBe(2);
+  expect(board.getValidMoves([0, 0]).length).toBe(0);
+  expect(board.getValidMoves([4, 4]).length).toBe(0);
 });

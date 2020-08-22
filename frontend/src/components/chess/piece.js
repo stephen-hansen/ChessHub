@@ -13,7 +13,7 @@ class Piece {
   }
 
   getRepresentation() {
-    return {string: this.name, color: this.color };
+    return { string: this.name, color: this.color };
   }
 
   isActive() {

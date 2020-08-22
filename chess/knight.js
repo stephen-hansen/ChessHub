@@ -3,7 +3,7 @@ const { Piece } = require('./piece.js');
 class Knight extends Piece {
   constructor(c, p) {
     super(c, p);
-    this.name = 'rook';
+    this.name = 'knight';
   }
 
   getMoves(b) {
