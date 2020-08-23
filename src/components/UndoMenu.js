@@ -7,7 +7,7 @@ class UndoMenu extends React.Component {
       <div className="undoMenu">
       <div className={`undo start ${this.props.startVisible}`}
       id="start">
-      <h3>You may only request one undo per game</h3>
+      <p>You may only request one undo per game</p>
       <button className="menubutton" id="startbutton"
       onClick={this.props.initiateUndo}>Undo Last Move</button>
       </div>
