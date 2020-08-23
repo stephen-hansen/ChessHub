@@ -144,7 +144,7 @@ io.on('connection', (socket) => {
       io.sockets.in(user.gameId).emit('forfeit');
       user.connected = false;
       const keys = Object.keys(games[user.gameId].players);
-      if (keys.length === 0
+      if (keys.length <= 1
         || (!games[user.gameId].players[keys[0]].connected
           && !games[user.gameId].players[keys[1]].connected)) {
         delete games[user.gameId];
