@@ -240,7 +240,13 @@ class Game extends React.Component {
   }
 
   synchronize() {
-    const audio = new Audio('./audio/move.mp3');
+    let url = './audio/move.mp3';
+    if (this.libBoard.isCheckmate()) {
+      url = './audio/checkmate.mp3';
+    } else if (this.libBoard.isCheck()) {
+      url = './audio/check.mp3';
+    }
+    const audio = new Audio(url);
     audio.play();
     const mayUndo = (this.libBoard.getTurn() === this.state.player
       && this.state.hasPlayed && this.state.mayUndo);
