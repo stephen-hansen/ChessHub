@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Helpful https://socket.io/docs/emit-cheatsheet/",
   "scripts": {
-    "test": "jest --coverage ./chess && coveralls < coverage/lcov.info",
-    "coverage": "jest --coverage ./chess",
+    "test": "jest --coverage ./src/components/chess && coveralls < coverage/lcov.info",
+    "coverage": "jest --coverage ./src/components/chess",
     "dev": "(cd ./backend && nodemon server.js)",
     "start-server": "(cd ./backend && node server.js)",
     "start-client": "(react-scripts start)",
