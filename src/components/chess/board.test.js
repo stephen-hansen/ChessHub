@@ -584,10 +584,6 @@ test('piece ADT does not have moves', () => {
 
 test('undo moves', () => {
   const board = new Board();
-  // Castle left white
-  board.applyCastle(castleLeft);
-  // Castle left black
-  board.applyCastle(castleLeft);
   // Free up white's bishop
   board.applyMove(new Move([6, 4], [5, 4]));
   // Free up black's bishop
@@ -621,6 +617,33 @@ test('undo moves', () => {
   expect(JSON.stringify(board.getBoard())).toStrictEqual(state2);
   // Do not undo 100 moves, would be errorneous
   expect(board.undo(100)).toBeFalsy();
+  const board2 = new Board();
+  // Move the pawn up and promote
+  // White pawn up 2
+  expect(board2.applyMove(new Move([6, 7], [4, 7]))).toBeTruthy();
+  // Black pawn down 2
+  expect(board2.applyMove(new Move([1, 6], [3, 6]))).toBeTruthy();
+  // Capture left
+  expect(board2.applyMove(new Move([4, 7], [3, 6]))).toBeTruthy();
+  // Black knight down
+  expect(board2.applyMove(new Move([0, 6], [2, 7]))).toBeTruthy();
+  // Capture right
+  expect(board2.applyMove(new Move([3, 6], [2, 7]))).toBeTruthy();
+  // Black bishop down
+  expect(board2.applyMove(new Move([0, 5], [1, 6]))).toBeTruthy();
+  // Capture left
+  expect(board2.applyMove(new Move([2, 7], [1, 6]))).toBeTruthy();
+  // Stall
+  expect(board2.applyMove(new Move([0, 1], [2, 0]))).toBeTruthy();
+  // Capture right, promote
+  expect(board2.applyMove(new Move([1, 6], [0, 7]))).toBeTruthy();
+  expect(board2.applyPromotion(promoteKnight)).toBeTruthy();
+  // Move the black knight
+  const state3 = JSON.stringify(board2.getBoard());
+  expect(board2.applyMove(new Move([2, 0], [0, 1]))).toBeTruthy();
+  // Undo the last move
+  expect(board2.undo(1)).toBeTruthy();
+  expect(JSON.stringify(board2.getBoard())).toStrictEqual(state3);
 });
 
 test('get board representation', () => {
@@ -875,4 +898,23 @@ test('SAN history', () => {
   }
 
   expect(expected.length).toBe(actual.length);
+
+  const board2 = new Board();
+  // Test a board where two pieces of same file move to square
+  board2.setBoard([new King(white, [7, 0]), new King(black, [0, 0]),
+    new Knight(white, [7, 7]), new Knight(white, [5, 7])]);
+  expect(board2.applyMove(new Move([7, 7], [6, 5]))).toBeTruthy();
+  expect(board2.getSANHistory()[0]).toBe('N1f2');
+
+  // Test a board for promotion
+  const terms = [promoteRook, promoteQueen, promoteBishop, promoteKnight];
+  const exp = ['h8R+', 'h8Q+', 'h8B', 'h8N'];
+  for (let i = 0; i < exp.length; i += 1) {
+    const board3 = new Board();
+    board3.setBoard([new King(white, [7, 0]), new King(black, [0, 0]),
+      new Pawn(white, [1, 7])]);
+    expect(board3.applyMove(new Move([1, 7], [0, 7]))).toBeTruthy();
+    expect(board3.applyPromotion(terms[i])).toBeTruthy();
+    expect(board3.getSANHistory()[0]).toBe(exp[i]);
+  }
 });
