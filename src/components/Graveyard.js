@@ -6,8 +6,9 @@ import './App.css';
 import getIconUrl from './imageUrls';
 
 export default class Graveyard extends React.Component {
-  renderSquare(p) {
+  renderSquare(p, i) {
     return <Square
+    key = {i}
     piece = {p.string}
     style = {{ backgroundImage: `url('${getIconUrl(p.string, p.color)}')` }}
     highlighted = {'nun'}
@@ -18,8 +19,8 @@ export default class Graveyard extends React.Component {
     return (
       <div>
       <h3>Lost Pieces</h3>
-      <div className="board-row">{this.props.white.map((p) => this.renderSquare(p.getRepresentation()))}</div>
-      <div className="board-row">{this.props.black.map((p) => this.renderSquare(p.getRepresentation()))}</div>
+      <div className="board-row">{this.props.white.map((p, i) => this.renderSquare(p.getRepresentation(), i))}</div>
+      <div className="board-row">{this.props.black.map((p, i) => this.renderSquare(p.getRepresentation(), i))}</div>
       </div>
     );
   }

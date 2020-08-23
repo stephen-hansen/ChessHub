@@ -59,12 +59,13 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit('gameFull');
     } else if (Object.keys(games[gameId].players).includes(username)) {
       // reconnect
+      socket.join(gameId);
       const user = games[gameId].players[username];
       user.connected = true;
       user.socketId = socket.id;
       io.to(socket.id).emit('game', `player=${user.color}`);
       io.to(socket.id).emit('gameStart', games[gameId].state);
-      socketIdsToUsers[socket.id] = gameId;
+      socketIdsToUsers[socket.id] = user;
     } else {
       socket.join(gameId);
       const user = new User(socket.id, username, gameId);
@@ -143,7 +144,7 @@ io.on('connection', (socket) => {
       io.sockets.in(user.gameId).emit('forfeit');
       user.connected = false;
       const keys = Object.keys(games[user.gameId].players);
-      if (keys.length === 1
+      if (keys.length === 0
         || (!games[user.gameId].players[keys[0]].connected
           && !games[user.gameId].players[keys[1]].connected)) {
         delete games[user.gameId];

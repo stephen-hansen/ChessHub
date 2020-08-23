@@ -9,6 +9,12 @@ import CastleMenu from './CastleMenu';
 import UndoMenu from './UndoMenu';
 
 import { Board as LibBoard } from './chess/board';
+import { Pawn } from './chess/pawn';
+import { Rook } from './chess/rook';
+import { Bishop } from './chess/bishop';
+import { Knight } from './chess/knight';
+import { King } from './chess/king';
+import { Queen } from './chess/queen';
 import { Move } from './chess/move';
 import { white, castleLeft, castleRight } from './chess/constants';
 
@@ -56,6 +62,58 @@ class Game extends React.Component {
     };
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  convertPiece(pieceobj) {
+    switch (pieceobj.name) {
+      case 'pawn':
+        return Object.assign(new Pawn(pieceobj.color, pieceobj.position), pieceobj);
+      case 'rook':
+        return Object.assign(new Rook(pieceobj.color, pieceobj.position), pieceobj);
+      case 'bishop':
+        return Object.assign(new Bishop(pieceobj.color, pieceobj.position), pieceobj);
+      case 'knight':
+        return Object.assign(new Knight(pieceobj.color, pieceobj.position), pieceobj);
+      case 'king':
+        return Object.assign(new King(pieceobj.color, pieceobj.position), pieceobj);
+      case 'queen':
+        return Object.assign(new Queen(pieceobj.color, pieceobj.position), pieceobj);
+      default:
+        return null;
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  convert(boardobj) {
+    const newBoard = new LibBoard();
+    for (let i = 0; i < boardobj.board.length; i += 1) {
+      for (let j = 0; j < boardobj.board[i].length; j += 1) {
+        const loc = [i, j];
+        const piece = boardobj.board[i][j];
+        let converted = null;
+        if (piece !== null) {
+          converted = this.convertPiece(piece);
+        }
+        newBoard.setPiece(loc, converted);
+      }
+    }
+    for (let i = 0; i < boardobj.history.length; i += 1) {
+      const moveobj = boardobj.history[i];
+      const { from } = moveobj;
+      const { to } = moveobj;
+      newBoard.history.push(Object.assign(new Move(from, to), moveobj));
+    }
+    for (let i = 0; i < boardobj.inactiveBlack.length; i += 1) {
+      const converted = this.convertPiece(boardobj.inactiveBlack[i]);
+      newBoard.inactiveBlack.push(converted);
+    }
+    for (let i = 0; i < boardobj.inactiveWhite.length; i += 1) {
+      const converted = this.convertPiece(boardobj.inactiveWhite[i]);
+      newBoard.inactiveWhite.push(converted);
+    }
+    newBoard.turn = boardobj.turn;
+    return newBoard;
+  }
+
   componentDidMount() {
     this.socket = io('http://localhost:8080');
     this.socket.emit('joinGame', this.params);
@@ -71,12 +129,24 @@ class Game extends React.Component {
         forfeit: true,
       });
     });
-    this.socket.on('gameStart', (state) => {
+    this.socket.on('gameStart', (data) => {
       // function to convert chesslib board to react state
       this.setState({
         ready: true,
-        // board: this.convert(state.board);
       });
+      this.libBoard = this.convert(data.board);
+      this.setState({
+        board: this.libBoard.getRepresentation(),
+        history: this.libBoard.getSANHistory(),
+        whiteDeaths: this.libBoard.inactiveWhite,
+        blackDeaths: this.libBoard.inactiveBlack,
+        turn: (this.libBoard.getTurn() === white) ? 0 : 1,
+        leftCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleLeft)) ? 'visible' : 'hidden',
+        rightCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleRight)) ? 'visible' : 'hidden',
+        startUndoVisible: 'hidden',
+        respondUndoVisible: 'hidden',
+      });
+      // Should undos persist on refresh?
     });
     this.socket.on('syncBoard', (move) => {
       const deserializedMove = new Move(move.from, move.to);
