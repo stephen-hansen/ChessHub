@@ -1,146 +1,137 @@
 import React from 'react';
 import './App.css';
-import Board from './Board.js';
-import GameInfo from './GameInfo.js';
-import Chat from './Chat.js';
-import Loading from './Loading.js';
-import CastleMenu from './CastleMenu.js';
-import UndoMenu from './UndoMenu.js';
-
-import { Board as LibBoard } from './chess/board.js';
-import { Move } from './chess/move.js';
-import { white, castleLeft, castleRight } from './chess/constants.js';
-
 import io from 'socket.io-client';
+import Board from './Board';
+import GameInfo from './GameInfo';
+import Chat from './Chat';
+import Loading from './Loading';
+import CastleMenu from './CastleMenu';
+import UndoMenu from './UndoMenu';
+
+import { Board as LibBoard } from './chess/board';
+import { Move } from './chess/move';
+import { white, castleLeft, castleRight } from './chess/constants';
 
 function getParamsFromURL(url) {
-    let urls = url.split("?")[1].split("&");
-    let params = {
-        username: "null",
-        gameId: "null"
+  const urls = url.split('?')[1].split('&');
+  const params = {
+    username: 'null',
+    gameId: 'null',
+  };
+  urls.forEach((val) => {
+    if (val.includes('username=')) {
+      params.username = val.substr(9);
+    } else if (val.includes('gameId=')) {
+      params.gameId = val.substr(7);
     }
-    urls.forEach((val) => {
-        if (val.includes("username=")) {
-            params.username = val.substr(9);
-        } else if (val.includes("gameId=")) {
-            params.gameId = val.substr(7);
-        }
-    });
-    return params;
+  });
+  return params;
 }
 
 class Game extends React.Component {
-    constructor() {
-        super();
-        this.params = getParamsFromURL(window.location.href);
-        this.libBoard = new LibBoard();
-        this.selectedPiece = false;
-        this.state = {
-            forfeit: false,
-            mayUndo: true,
-            hasPlayed: false,
-			locked: false,
-            ready: false,
-            board: this.libBoard.getRepresentation(),
-            history: this.libBoard.getSANHistory(),
-            highlighted: [],
-            leftCastleVisible: "hidden",
-            rightCastleVisible: "hidden",
-            startUndoVisible: "hidden",
-            respondUndoVisible: "hidden",
-            whiteDeaths: this.libBoard.inactiveWhite,
-            blackDeaths: this.libBoard.inactiveBlack,
-            player: null,
-            turn: 0,
-            info: "",
-            currentSource: []
-        }
-    }
+  constructor() {
+    super();
+    this.params = getParamsFromURL(window.location.href);
+    this.libBoard = new LibBoard();
+    this.selectedPiece = false;
+    this.state = {
+      forfeit: false,
+      mayUndo: true,
+      hasPlayed: false,
+      locked: false,
+      ready: false,
+      board: this.libBoard.getRepresentation(),
+      history: this.libBoard.getSANHistory(),
+      highlighted: [],
+      leftCastleVisible: 'hidden',
+      rightCastleVisible: 'hidden',
+      startUndoVisible: 'hidden',
+      respondUndoVisible: 'hidden',
+      whiteDeaths: this.libBoard.inactiveWhite,
+      blackDeaths: this.libBoard.inactiveBlack,
+      player: null,
+      turn: 0,
+      info: '',
+      currentSource: [],
+    };
+  }
 
-    componentDidMount() {
-        this.socket = io("http://localhost:8080");
-        this.socket.emit("joinGame", this.params);
-        this.socket.on("game", (msg) => {
-            console.log(msg);
-            if (!this.state.player && msg.includes("player=")) {
-                this.setState({
-                    player: msg.substr(7)
-                });
-            }
+  componentDidMount() {
+    this.socket = io('http://localhost:8080');
+    this.socket.emit('joinGame', this.params);
+    this.socket.on('game', (msg) => {
+      if (!this.state.player && msg.includes('player=')) {
+        this.setState({
+          player: msg.substr(7),
         });
-        this.socket.on("forfeit", () => {
-            this.setState({
-                forfeit: true
-            });
-            console.log("Your opponent has left");
-        });
-        this.socket.on("gameStart", (state) => {
-            //function to convert chesslib board to react state
-            this.setState({
-                ready: true
-                    //board: this.convert(state.board);
-            });
-        });
-        this.socket.on("syncBoard", (move) => {
-            let deserializedMove = new Move(move.from, move.to);
-            const piece = this.libBoard.getPiece(move.from);
-            if (piece === null || piece.getColor() === this.state.player) {
-               console.log("move already synced");
-               return;
-            }
-            if (this.libBoard.applyMove(deserializedMove)) {
-                this.synchronize();
-                this.highlightMove(deserializedMove);
-            } else {
-                console.log("move already synced");
-            }
-        });
-        this.socket.on("syncCastleBoard", (move) => {
-            const color = move.color;
-            const dir = move.direction;
-            if (color === this.state.player) {
-              console.log("move already synced");
-              return;
-            }
-            if (this.libBoard.applyCastle(dir)) {
-              this.synchronize();
-              this.highlightCastle(this.libBoard.getOpponent(), dir);
-            } else {
-                console.log("move already synced");
-            }
-        });
-		this.socket.on("checkmate", (data) => {
-      const name = data === white ? "White" : "Black";
-			this.setState({
-				info: name + " wins by checkmate!",
-				locked: true,
-        mayUndo: false,
-        startUndoVisible: "hidden",
-			});
-		});
- 		this.socket.on("stalemate", (data) => {
-			const name = data === white ? "White" : "Black";
+      }
+    });
+    this.socket.on('forfeit', () => {
       this.setState({
-				info: "Draw! " + name + " is stalemated.",
-				locked: true,
+        forfeit: true,
+      });
+    });
+    this.socket.on('gameStart', (state) => {
+      // function to convert chesslib board to react state
+      this.setState({
+        ready: true,
+        // board: this.convert(state.board);
+      });
+    });
+    this.socket.on('syncBoard', (move) => {
+      const deserializedMove = new Move(move.from, move.to);
+      const piece = this.libBoard.getPiece(move.from);
+      if (piece === null || piece.getColor() === this.state.player) {
+        return;
+      }
+      if (this.libBoard.applyMove(deserializedMove)) {
+        this.synchronize();
+        this.highlightMove(deserializedMove);
+      }
+    });
+    this.socket.on('syncCastleBoard', (move) => {
+      const { color } = move;
+      const dir = move.direction;
+      if (color === this.state.player) {
+        return;
+      }
+      if (this.libBoard.applyCastle(dir)) {
+        this.synchronize();
+        this.highlightCastle(this.libBoard.getOpponent(), dir);
+      }
+    });
+    this.socket.on('checkmate', (data) => {
+      const name = data === white ? 'White' : 'Black';
+      this.setState({
+        info: `${name} wins by checkmate!`,
+        locked: true,
         mayUndo: false,
-        startUndoVisible: "hidden",
-			});
-		});
-    this.socket.on("syncUndo", (data) => {
+        startUndoVisible: 'hidden',
+      });
+    });
+    this.socket.on('stalemate', (data) => {
+      const name = data === white ? 'White' : 'Black';
+      this.setState({
+        info: `Draw! ${name} is stalemated.`,
+        locked: true,
+        mayUndo: false,
+        startUndoVisible: 'hidden',
+      });
+    });
+    this.socket.on('syncUndo', (data) => {
       if (!data.confirm) {
         this.setState({
-          info: "Undo rejected.",
+          info: 'Undo rejected.',
           locked: false,
           mayUndo: false,
-          startUndoVisible: "hidden",
+          startUndoVisible: 'hidden',
         });
         return;
       }
       const highlighted = Array(64).fill(false);
-				this.setState({
-					highlighted: highlighted
-				});
+      this.setState({
+        highlighted,
+      });
       this.libBoard.undo(2);
       this.synchronize();
       this.setState({
@@ -161,25 +152,25 @@ class Game extends React.Component {
         });
       }
       this.setState({
-        info: "Undo confirmed.",
+        info: 'Undo confirmed.',
         locked: false,
         turn: !this.state.turn,
       });
     });
-    this.socket.on("answerUndo", (data) => {
-      const color = data.color;
+    this.socket.on('answerUndo', (data) => {
+      const { color } = data;
       if (color === this.state.player) {
         return;
       }
       this.setState({
         locked: true,
-        respondUndoVisible: "visible",
+        respondUndoVisible: 'visible',
       });
     });
   }
 
   synchronize() {
-    const audio = new Audio("./audio/move.mp3");
+    const audio = new Audio('./audio/move.mp3');
     audio.play();
     const mayUndo = (this.libBoard.getTurn() === this.state.player
       && this.state.hasPlayed && this.state.mayUndo);
@@ -187,39 +178,39 @@ class Game extends React.Component {
       history: this.libBoard.getSANHistory(),
       board: this.libBoard.getRepresentation(),
       turn: !this.state.turn,
-      leftCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleLeft)) ? "visible" : "hidden",
-      rightCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleRight)) ? "visible" : "hidden",
-      startUndoVisible: mayUndo ? "visible" : "hidden",
-      respondUndoVisible: "hidden",
+      leftCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleLeft)) ? 'visible' : 'hidden',
+      rightCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleRight)) ? 'visible' : 'hidden',
+      startUndoVisible: mayUndo ? 'visible' : 'hidden',
+      respondUndoVisible: 'hidden',
     });
   }
 
   initiateUndo() {
-    if(!this.state.locked){
-			const t = this.libBoard.getTurn();
-			if (this.state.player !== t) {
-				this.setState({
-					info: "It is not your turn!"
-				});
-				return;
-			}
+    if (!this.state.locked) {
+      const t = this.libBoard.getTurn();
+      if (this.state.player !== t) {
+        this.setState({
+          info: 'It is not your turn!',
+        });
+        return;
+      }
       if (!this.state.hasPlayed) {
         this.setState({
-          info: "No move available to undo!"
+          info: 'No move available to undo!',
         });
         return;
       }
       if (!this.state.mayUndo) {
         this.setState({
-          info: "No more available undos!"
+          info: 'No more available undos!',
         });
         return;
       }
 
-		  this.socket.emit("undo", { color: this.state.player });
-		  this.setState({
-        info: "Waiting on response from opponent...",
-        startUndoVisible: "hidden",
+      this.socket.emit('undo', { color: this.state.player });
+      this.setState({
+        info: 'Waiting on response from opponent...',
+        startUndoVisible: 'hidden',
         locked: true,
         mayUndo: false,
       });
@@ -228,100 +219,98 @@ class Game extends React.Component {
 
   respondToUndo(answer) {
     this.setState({
-        respondUndoVisible: "hidden",
+      respondUndoVisible: 'hidden',
     });
-    this.socket.emit("respondToUndo", { confirm: answer });
+    this.socket.emit('respondToUndo', { confirm: answer });
   }
 
-	handleCastle(direction) {
-		if(!this.state.locked){
-			const t = this.libBoard.getTurn();
-			if (this.state.player !== t) {
-				this.setState({
-					info: "It is not your turn!"
-				});
-				return;
-			}
-			this.setState({ info: "" });
-			console.log("Castle" + direction)
-			if (this.libBoard.applyCastle(direction)) {
-				this.synchronize();
-				//sync the library version of the board alongside the move that just occured
-				this.socket.emit("syncCastle", { direction: direction, color: this.state.player });
+  handleCastle(direction) {
+    if (!this.state.locked) {
+      const t = this.libBoard.getTurn();
+      if (this.state.player !== t) {
+        this.setState({
+          info: 'It is not your turn!',
+        });
+        return;
+      }
+      this.setState({ info: '' });
+      if (this.libBoard.applyCastle(direction)) {
+        this.synchronize();
+        // sync the library version of the board alongside the move that just occured
+        this.socket.emit('syncCastle', { direction, color: this.state.player });
         this.highlightCastle(this.state.player, direction);
       }
-		}
-	}
+    }
+  }
 
-    handleClick(row, col) {
-		if(!this.state.locked){
-			const t = this.libBoard.getTurn();
-			if (this.state.player !== t) {
-				this.setState({
-					info: "It is not your turn!"
-				});
-				return;
-			}
-			this.setState({ info: "" });
-			if (this.selectedPiece) {
-				console.log("Move Piece")
-					// As an added precaution, i.e. I'm not certain this will ever trigger
-					// But safe to have
-				const sourceP = this.libBoard.getPiece(this.state.currentSource);
-				if (sourceP === null || sourceP.getColor() !== this.state.player) {
-					this.setState({
-						currentSource: []
-					});
-					this.selectedPiece = !this.selectedPiece;
-					return;
-				}
-				const highlighted = Array(64).fill(false);
-				this.setState({
-					highlighted: highlighted
-				});
-				//Destination is row,col
-				//Check if destination is valid
-				let move = new Move(this.state.currentSource, [row, col]);
-				if (this.libBoard.applyMove(move)) {
-					this.synchronize();
-					//sync the library version of the board alongside the move that just occured
-					this.socket.emit("sync", {
-						move
-					});
+  handleClick(row, col) {
+    if (!this.state.locked) {
+      const t = this.libBoard.getTurn();
+      if (this.state.player !== t) {
+        this.setState({
+          info: 'It is not your turn!',
+        });
+        return;
+      }
+      this.setState({ info: '' });
+      if (this.selectedPiece) {
+        // As an added precaution, i.e. I'm not certain this will ever trigger
+        // But safe to have
+        const sourceP = this.libBoard.getPiece(this.state.currentSource);
+        if (sourceP === null || sourceP.getColor() !== this.state.player) {
+          this.setState({
+            currentSource: [],
+          });
+          this.selectedPiece = !this.selectedPiece;
+          return;
+        }
+        const highlighted = Array(64).fill(false);
+        this.setState({
+          highlighted,
+        });
+        // Destination is row,col
+        // Check if destination is valid
+        const move = new Move(this.state.currentSource, [row, col]);
+        if (this.libBoard.applyMove(move)) {
+          this.synchronize();
+          // sync the library version of the board alongside the move that just occured
+          this.socket.emit('sync', {
+            move,
+          });
           this.setState({
             hasPlayed: true,
           });
           this.highlightMove(move);
           this.selectedPiece = !this.selectedPiece;
-				} else {
+        } else {
           // If user selects a different piece, set it to be current
           const pieceAtClick = this.libBoard.getPiece([row, col]);
           if (pieceAtClick !== null && pieceAtClick.getColor() === this.state.player) {
             this.setState({
-              currentSource: [row, col]
+              currentSource: [row, col],
             });
             this.handleHighlights(row, col);
           } else {
             this.setState({
-              currentSource: []
+              currentSource: [],
             });
             this.selectedPiece = !this.selectedPiece;
           }
         }
-			} else {
-				//Select Piece
-				const sourceP = this.libBoard.getPiece([row, col]);
-				if (sourceP === null || sourceP.getColor() !== this.state.player) {
-					return;
-				}
-				this.handleHighlights(row, col);
-				this.setState({
-					currentSource: [row, col]
-				})
+      } else {
+        // Select Piece
+        const sourceP = this.libBoard.getPiece([row, col]);
+        if (sourceP === null || sourceP.getColor() !== this.state.player) {
+          return;
+        }
+        this.handleHighlights(row, col);
+        this.setState({
+          currentSource: [row, col],
+        });
         this.selectedPiece = !this.selectedPiece;
-			}
-		}
+      }
     }
+  }
 
   highlightCastle(color, direction) {
     const highlighted = Array(64).fill(false);
@@ -329,11 +318,11 @@ class Game extends React.Component {
     const dir = direction === castleLeft ? -1 : 1;
 
     for (let i = 0; i < 3; i += 1) {
-      const square = 8*row + 4 + dir*i; 
+      const square = 8 * row + 4 + dir * i;
       highlighted[square] = true;
     }
     this.setState({
-      highlighted: highlighted
+      highlighted,
     });
   }
 
@@ -344,121 +333,119 @@ class Game extends React.Component {
     const to = move.getTo();
     highlighted[to[0] * 8 + to[1]] = true;
     this.setState({
-      highlighted: highlighted
+      highlighted,
     });
   }
 
-    handleHighlights(row, col) {
-        const moveTos = this.libBoard.getValidMoves([row, col]);
-        const highlighted = Array(64).fill(false);
-        for (let i = 0; i < moveTos.length; i += 1) {
-            const moveTo = moveTos[i];
-            const num = moveTo[0] * 8 + moveTo[1];
-            highlighted[num] = true;
-        }
-        this.setState({
-            highlighted: highlighted
-        });
+  handleHighlights(row, col) {
+    const moveTos = this.libBoard.getValidMoves([row, col]);
+    const highlighted = Array(64).fill(false);
+    for (let i = 0; i < moveTos.length; i += 1) {
+      const moveTo = moveTos[i];
+      const num = moveTo[0] * 8 + moveTo[1];
+      highlighted[num] = true;
     }
+    this.setState({
+      highlighted,
+    });
+  }
 
-    renderGame() {
-        return ( 
-		<div className = "gamePage" >
-            <div className="header">
-				<h1>ChessHub</h1>
-			</div> 
-			<div className = "game-column board" >
-            <Board squares = {this.state.board}
-            highlighted = {
-                this.state.highlighted
-            }
-            onClick = {
-                (r, c) => this.handleClick(r, c)
-            }
-            />
-			</div> 
-          <div className = "game-column castleMenu" >
-             <CastleMenu 
-             leftVisible = {this.state.leftCastleVisible}
-             leftClick = {
-               () => this.handleCastle(castleLeft)
-             }
-             rightVisible = {this.state.rightCastleVisible}
-             rightClick = {
-               () => this.handleCastle(castleRight)
-             }
-             />
-          </div>
-          <div className = "game-column undoMenu" >
-             <UndoMenu
-             startVisible = {this.state.startUndoVisible}
-             respondVisible = {this.state.respondUndoVisible}
-             initiateUndo = {
-               () => this.initiateUndo()
-             }
-             confirmUndo = {
-               () => this.respondToUndo(true)
-             }
-             declineUndo = {
-               () => this.respondToUndo(false)
-             }
-             />
-          </div>
-          <div className = "game-column info" >
-            <GameInfo player = {
-                this.state.player
-            }
-            turn = {
-                this.state.turn
-            }
-            white = {
-                this.state.whiteDeaths
-            }
-            black = {
-                this.state.blackDeaths
-            }
-            history = {
-                this.state.history
-            }
-            /> 
-			</div> 
-			<div className = "lower-info" >
-            <h3 > {
-                this.state.info
-            } </h3> 
-			</div> 
-			<div className="chat">
-				<Chat
-					username={this.params.username}
-					socket={this.socket}
-				/>
-				</div>
+  renderGame() {
+    return (
+      <div className = "gamePage" >
+      <div className="header">
+      <h1>ChessHub</h1>
+      </div>
+      <div className = "game-column board" >
+      <Board squares = {this.state.board}
+      highlighted = {
+        this.state.highlighted
+      }
+      onClick = {
+        (r, c) => this.handleClick(r, c)
+      }
+      />
+      </div>
+      <div className = "game-column castleMenu" >
+      <CastleMenu
+      leftVisible = {this.state.leftCastleVisible}
+      leftClick = {
+        () => this.handleCastle(castleLeft)
+      }
+      rightVisible = {this.state.rightCastleVisible}
+      rightClick = {
+        () => this.handleCastle(castleRight)
+      }
+      />
+      </div>
+      <div className = "game-column undoMenu" >
+      <UndoMenu
+      startVisible = {this.state.startUndoVisible}
+      respondVisible = {this.state.respondUndoVisible}
+      initiateUndo = {
+        () => this.initiateUndo()
+      }
+      confirmUndo = {
+        () => this.respondToUndo(true)
+      }
+      declineUndo = {
+        () => this.respondToUndo(false)
+      }
+      />
+      </div>
+      <div className = "game-column info" >
+      <GameInfo player = {
+        this.state.player
+      }
+      turn = {
+        this.state.turn
+      }
+      white = {
+        this.state.whiteDeaths
+      }
+      black = {
+        this.state.blackDeaths
+      }
+      history = {
+        this.state.history
+      }
+      />
+      </div>
+      <div className = "lower-info" >
+      <h3 > {
+        this.state.info
+      } </h3>
+      </div>
+      <div className="chat">
+      <Chat
+      username={this.params.username}
+      socket={this.socket}
+      />
+      </div>
 
-		</div>
-        );
+      </div>
+    );
+  }
+
+  renderLoading() {
+    return <Loading
+    username = {
+      this.params.username
     }
-
-    renderLoading() {
-        return <Loading
-        username = {
-            this.params.username
-        }
-        gameid = {
-            this.params.gameId
-        }
-        />
+    gameid = {
+      this.params.gameId
     }
+      />;
+  }
 
-    render() {
-        let {
-            ready
-        } = this.state;
-        if (ready)
-            return this.renderGame();
-        else {
-            return this.renderLoading();
-        }
-    }
+  render() {
+    const {
+      ready,
+    } = this.state;
+    if (ready) return this.renderGame();
+
+    return this.renderLoading();
+  }
 }
 
 export default Game;
