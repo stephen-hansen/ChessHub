@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 const {
   castleLeft,
-  castleRight,
   promoteKnight,
   promoteQueen,
   promoteRook,
@@ -64,8 +63,7 @@ class Move {
     if (this.getType() === moveCastle) {
       if (this.getCastleSide() === castleLeft) {
         san = '0-0-0';
-      }
-      if (this.getCastleSide() === castleRight) {
+      } else {
         san = '0-0';
       }
     } else {

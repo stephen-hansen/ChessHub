@@ -595,6 +595,7 @@ class Board {
   applyDraw() {
     const move = new Move(null, null);
     move.setType(moveDraw);
+    this.history.push(move);
     return true;
   }
 
@@ -620,8 +621,6 @@ class Board {
       } else if (move.getType() === movePromotion) {
         this.applyMove(move);
         this.applyPromotion(move.getPromotion());
-      } else if (move.getType() === moveDraw) {
-        this.applyDraw();
       }
     }
 

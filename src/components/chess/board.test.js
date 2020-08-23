@@ -917,4 +917,23 @@ test('SAN history', () => {
     expect(board3.applyPromotion(terms[i])).toBeTruthy();
     expect(board3.getSANHistory()[0]).toBe(exp[i]);
   }
+
+  // Ensure coverage hits setpromotion
+  const m = new Move([0, 0], [0, 1]);
+  m.setPromotion('foobar');
+  expect(m.getPromotion()).toBe('foobar');
+
+  // Ignore duplicate draws in undo
+  const board4 = new Board();
+  board4.applyDraw();
+  board4.applyDraw();
+  expect(board4.undo(1)).toBeTruthy();
+  const hist = board4.getHistory();
+  expect(hist.length).toBe(0);
+});
+
+test('apply draw', () => {
+  const board = new Board();
+  expect(board.applyDraw()).toBeTruthy();
+  expect(board.getSANHistory()[0]).toBe('(=)');
 });
