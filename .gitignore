@@ -25,3 +25,8 @@ hs_err_pid*
 # Vim
 *~
 .*~
+*.swo
+*.swp
+
+# Node
+node_modules/
