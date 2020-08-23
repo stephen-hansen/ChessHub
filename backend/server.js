@@ -9,8 +9,8 @@ const port = process.env.PORT || 8080;
 
 const { generate, Game } = require("./utils/games.js");
 const { userJoin, userLeave, getUsers, User } = require("./utils/users.js");
-const { white, black } = require("../chess/constants.js");
-const { Move } = require("../chess/move.js");
+const { white, black } = require("../src/components/chess/constants.js");
+const { Move } = require("../src/components/chess/move.js");
 
 app.use(express.static(path.join(__dirname, "public")));
 

@@ -1,4 +1,4 @@
-const { Board } = require("../../chess/board.js");
+const { Board } = require("../../src/components/chess/board.js");
 class Game {
     constructor(gameId) {
         this.id = gameId;

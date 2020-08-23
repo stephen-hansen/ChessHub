@@ -264,6 +264,8 @@ class Board {
     piece.setMoved();
     // Verify en Passant if it occurs
     if (this.enPassant()) {
+      detailedMove.setDepFile();
+      detailedMove.setCapture();
       detailedMove.setEnPassant();
     }
     this.setTurn(this.getOpponent());
