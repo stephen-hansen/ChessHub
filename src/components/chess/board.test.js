@@ -302,21 +302,155 @@ test('rejected bishop moves', () => {
 });
 
 test('accepted knight moves', () => {
+  const moveTos = [[2, 3], [2, 5], [6, 3], [6, 5], [3, 2], [3, 6], [5, 2], [5, 6]];
+  // Test white
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const knight = new Knight(white, [4, 4]);
+    board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), knight]);
+    expect(board.applyMove(new Move(knight.getPosition(), moveTos[i]))).toBeTruthy();
+  }
+  // Test black
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const knight = new Knight(black, [4, 4]);
+    board.setTurn(black);
+    board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), knight]);
+    expect(board.applyMove(new Move(knight.getPosition(), moveTos[i]))).toBeTruthy();
+  }
+  // Test capture
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const knight = new Knight(white, [4, 4]);
+    const bKnight = new Knight(black, moveTos[i]);
+    board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), knight, bKnight]);
+    expect(board.applyMove(new Move(knight.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(bKnight.isActive()).toBeFalsy();
+  }
 });
 
 test('rejected knight moves', () => {
+  let moveTos = [[-1, -1], [3, 3], [3, 4], [3, 5], [4, 3], [4, 5], [5, 3], [5, 4], [5, 5]];
+  // Test bad moves
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const knight = new Knight(white, [4, 4]);
+    board.setBoard([knight, new King(white, [7, 0]), new King(black, [0, 0])]);
+    expect(board.applyMove(new Move(knight.getPosition(), moveTos[i]))).toBeFalsy();
+  }
+  // Test invalid capture
+  moveTos = [[2, 3], [2, 5], [6, 3], [6, 5], [3, 2], [3, 6], [5, 2], [5, 6]];
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const knight = new Knight(white, [4, 4]);
+    const wKnight = new Knight(white, moveTos[i]);
+    board.setBoard([new King(white, [7, 0]), new King(black, [0, 0]), knight, wKnight]);
+    expect(board.applyMove(new Move(knight.getPosition(), moveTos[i]))).toBeFalsy();
+    expect(wKnight.isActive()).toBeTruthy();
+  }
 });
 
 test('accepted queen moves', () => {
+  const moveTos = [[0, 0], [0, 4], [4, 7], [7, 7], [7, 4], [4, 0],
+    [3, 3], [3, 4], [3, 5], [4, 3], [4, 5], [5, 3], [5, 4], [5, 5]];
+  // Test all valid moves
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const queen = new Queen(white, [4, 4]);
+    board.setBoard([new King(white, [2, 3]), new King(black, [6, 5]), queen]);
+    expect(board.applyMove(new Move(queen.getPosition(), moveTos[i]))).toBeTruthy();
+  }
+  // Test capture
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const queen = new Queen(white, [4, 4]);
+    const bQueen = new Queen(black, moveTos[i]);
+    board.setBoard([new King(white, [2, 3]), new King(black, [6, 5]), queen, bQueen]);
+    expect(board.applyMove(new Move(queen.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(bQueen.isActive()).toBeFalsy();
+  }
 });
 
 test('rejected queen moves', () => {
+  let moveTos = [[2, 3], [2, 5], [6, 3], [6, 5], [3, 2], [3, 6], [5, 2], [5, 6]];
+  // Test invalid (knight) moves
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const queen = new Queen(white, [4, 4]);
+    board.setBoard([new King(white, [2, 3]), new King(black, [6, 5]), queen]);
+    expect(board.applyMove(new Move(queen.getPosition(), moveTos[i]))).toBeFalsy();
+  }
+  // Test jumping over opponents
+  moveTos = [[0, 0], [0, 4], [0, 7], [4, 7], [7, 7], [7, 4], [7, 0], [4, 0]];
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const queen = new Queen(white, [4, 4]);
+    board.setBoard([new King(white, [2, 3]), new King(black, [6, 5]), queen,
+      new Pawn(black, [3, 3]), new Pawn(black, [3, 4]), new Pawn(black, [3, 5]),
+      new Pawn(black, [4, 3]), new Pawn(black, [4, 5]), new Pawn(black, [5, 3]),
+      new Pawn(black, [5, 4]), new Pawn(black, [5, 5])]);
+    expect(board.applyMove(new Move(queen.getPosition(), moveTos[i]))).toBeFalsy();
+  }
+  // Test invalid capture
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const queen = new Queen(white, [4, 4]);
+    const wQueen = new Queen(white, moveTos[i]);
+    board.setBoard([new King(white, [2, 3]), new King(black, [6, 5]), queen, wQueen]);
+    expect(board.applyMove(new Move(queen.getPosition(), moveTos[i]))).toBeFalsy();
+    expect(wQueen.isActive()).toBeTruthy();
+  }
 });
 
 test('accepted king moves', () => {
+  const moveTos = [[3, 3], [3, 4], [3, 5], [4, 3], [4, 5], [5, 3], [5, 4], [5, 5]];
+  // Test white
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const king = new King(white, [4, 4]);
+    board.setBoard([king, new King(black, [0, 0])]);
+    expect(board.applyMove(new Move(king.getPosition(), moveTos[i]))).toBeTruthy();
+  }
+  // Test black
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const king = new King(black, [4, 4]);
+    board.setTurn(black);
+    board.setBoard([king, new King(white, [0, 0])]);
+    expect(board.applyMove(new Move(king.getPosition(), moveTos[i]))).toBeTruthy();
+  }
+  // Test capture
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const king = new King(white, [4, 4]);
+    const bPawn = new Pawn(black, moveTos[i]);
+    board.setBoard([new King(white, [7, 0]), king, bPawn]);
+    expect(board.applyMove(new Move(king.getPosition(), moveTos[i]))).toBeTruthy();
+    expect(bPawn.isActive()).toBeFalsy();
+  }
 });
 
 test('rejected king moves', () => {
+  let moveTos = [[-1, -1], [1, 4], [4, 1], [2, 3], [2, 5], [6, 3], [6, 5],
+    [3, 2], [3, 6], [5, 2], [5, 6]];
+  // Test bad moves
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const king = new King(white, [4, 4]);
+    board.setBoard([king, new King(black, [0, 0])]);
+    expect(board.applyMove(new Move(king.getPosition(), moveTos[i]))).toBeFalsy();
+  }
+
+  moveTos = [[3, 3], [3, 4], [3, 5], [4, 3], [4, 5], [5, 3], [5, 4], [5, 5]];
+  // Test invalid capture
+  for (let i = 0; i < moveTos.length; i += 1) {
+    const board = new Board();
+    const king = new King(white, [4, 4]);
+    const wPawn = new Pawn(white, moveTos[i]);
+    board.setBoard([new King(white, [7, 0]), king, wPawn]);
+    expect(board.applyMove(new Move(king.getPosition(), moveTos[i]))).toBeFalsy();
+    expect(wPawn.isActive()).toBeTruthy();
+  }
 });
 
 test('detect check in move validation', () => {
@@ -448,6 +582,11 @@ test('pawn promotion', () => {
 });
 
 test('initial pawn move', () => {
+  const board = new Board();
+  expect(board.applyMove(new Move([6, 0], [4, 0]))).toBeTruthy();
+  expect(board.applyMove(new Move([1, 7], [3, 7]))).toBeTruthy();
+  expect(board.applyMove(new Move([4, 0], [2, 0]))).toBeFalsy();
+  expect(board.applyMove(new Move([3, 7], [5, 7]))).toBeFalsy();
 });
 
 test('en passant capture', () => {
@@ -930,6 +1069,29 @@ test('SAN history', () => {
   expect(board4.undo(1)).toBeTruthy();
   const hist = board4.getHistory();
   expect(hist.length).toBe(0);
+
+  // Test a queenside castle
+  const board5 = new Board();
+  board5.setPiece([7, 1], null);
+  board5.setPiece([7, 2], null);
+  board5.setPiece([7, 3], null);
+  // Castle left white
+  expect(board5.applyCastle(castleLeft)).toBeTruthy();
+  expect(board5.getSANHistory()[0]).toBe('0-0-0');
+  // Left capture via en passant, white
+  const board6 = new Board();
+  board6.setTurn(black);
+  const passantPawn = new Pawn(black, [1, 3]);
+  const capturingPawn = new Pawn(white, [3, 4]);
+  board6.setBoard([new King(white, [1, 7]),
+    new King(black, [0, 0]),
+    passantPawn,
+    capturingPawn]);
+  expect(board6.applyMove(new Move([1, 3], [3, 3]))).toBeTruthy();
+  expect(passantPawn.isEnPassant()).toBeTruthy();
+  expect(board6.applyMove(new Move([3, 4], [2, 3]))).toBeTruthy();
+  const hist2 = board6.getSANHistory();
+  expect(hist2[hist2.length - 1]).toBe('exd6 e.p.');
 });
 
 test('apply draw', () => {

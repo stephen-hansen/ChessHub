@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 
 const app = express();
@@ -16,18 +15,20 @@ const {
 const { white, black } = require('../src/components/chess/constants.js');
 const { Move } = require('../src/components/chess/move.js');
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(cors());
 
+/**
 app.get('/g', (req, res) => {
   // eslint-disable-next-line no-unused-vars
   const { username, gameId } = req.query;
   res.sendFile(path.join(`${__dirname}/public/game.html`));
 });
+*/
 
 // create a new game
 app.post('/api/createGame', (req, res) => {
