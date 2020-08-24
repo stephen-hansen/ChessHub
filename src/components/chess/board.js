@@ -22,6 +22,10 @@ const { Rook } = require('./rook.js');
 const { Move } = require('./move.js');
 
 class Board {
+  /**
+   * @function constructor create a new chessboard
+   * @return {Board}
+   */
   constructor() {
     this.board = this.loadBoard(this.createPieces());
     this.turn = white;
@@ -30,6 +34,10 @@ class Board {
     this.inactiveBlack = [];
   }
 
+  /**
+   * @function getSANHistory get list of moves in SAN form
+   * @return {[String]}
+   */
   getSANHistory() {
     const hist = [];
     this.history.forEach((move) => {
@@ -38,6 +46,10 @@ class Board {
     return hist;
   }
 
+  /**
+   * @function getRepresentation get colors and strings for all pieces
+   * @return {[Object]}
+   */
   getRepresentation() {
     const board = [];
     this.board.forEach((row, index) => {
@@ -49,34 +61,68 @@ class Board {
     return board;
   }
 
+  /**
+   * @function setTurn set turn to player
+   * @param {String} player
+   */
   setTurn(player) {
     this.turn = player;
   }
 
+  /**
+   * @function getTurn get currently playing color
+   * @return {String}
+   */
   getTurn() {
     return this.turn;
   }
 
+  /**
+   * @function getHistory get move history
+   * @return {[Move]}
+   */
   getHistory() {
     return this.history;
   }
 
+  /**
+   * @function setBoard set board with specified pieces
+   * @param {[Piece]} pieces
+   */
   setBoard(pieces) {
     this.board = this.loadBoard(pieces);
   }
 
+  /**
+   * @function getBoard get array representation of board
+   * @return {[[Piece]]}
+   */
   getBoard() {
     return this.board;
   }
 
+  /**
+   * @function getPiece get piece at location
+   * @param {[int]} loc
+   * @return {Piece}
+   */
   getPiece(loc) {
     return this.board[loc[0]][loc[1]];
   }
 
+  /**
+   * @function setPiece set piece at location
+   * @param {[int]} loc
+   * @param {Piece} piece
+   */
   setPiece(loc, piece) {
     this.board[loc[0]][loc[1]] = piece;
   }
 
+  /**
+   * @function getOpponent get player who is not currently playing
+   * @return {String}
+   */
   getOpponent() {
     if (this.getTurn() === white) {
       return black;
@@ -84,6 +130,10 @@ class Board {
     return white;
   }
 
+  /**
+   * @function createPieces create list of default piece layout
+   * @return {[Piece]}
+   */
   createPieces() {
     const pieces = [];
 
@@ -124,6 +174,11 @@ class Board {
     return pieces;
   }
 
+  /**
+   * @function loadBoard pieces convert piece list to a board
+   * @param {[Piece]} pieces
+   * @return {[[Piece]]}
+   */
   loadBoard(pieces) {
     const board = [];
     for (let i = 0; i < 8; i += 1) {
@@ -144,12 +199,24 @@ class Board {
     return board;
   }
 
+  /**
+   * @function isValidMove check if move is valid for a piece
+   * @param {Piece} piece
+   * @param {Move} move
+   * @return {bool}
+   */
   isValidMove(piece, move) {
     // Check that the move is valid and that it does not cause check
     return piece.isActive() && piece.getColor() === this.getTurn()
       && piece.isValidMove(move, this) && !this.causesCheck(piece, move);
   }
 
+  /**
+   * @function causesCheck determine if a move causes check
+   * @param {Piece} piece
+   * @param {Move} move
+   * @return {bool}
+   */
   causesCheck(piece, move) {
     // Simulate the move and see if it places the player in check
     const p = piece.getPosition();
@@ -167,6 +234,11 @@ class Board {
     return causesCheck;
   }
 
+  /**
+   * @function filterMoves remove all moves for a piece that place king in check
+   * @param {Piece} piece
+   * @return {[Move]}
+   */
   filterMoves(piece) {
     const finalMoves = [];
     const moves = piece.getMoves(this);
@@ -179,6 +251,11 @@ class Board {
     return finalMoves;
   }
 
+  /**
+   * @function getValidMoves get valid moves at location
+   * @param {[Int]} loc
+   * @return {[Move]}
+   */
   getValidMoves(loc) {
     const piece = this.getPiece(loc);
     if (piece === null) {
@@ -192,6 +269,11 @@ class Board {
     return moveTos;
   }
 
+  /**
+   * @function includeRankOrFile determine whether deparature is included for move notation
+   * @param {Move} move
+   * @return {Move}
+   */
   includeRankOrFile(move) {
     const pieces = this.getPieces();
     const from = move.getFrom();
@@ -230,6 +312,11 @@ class Board {
     return move;
   }
 
+  /**
+   * @function applyMove applies a move to a board state if it is legal
+   * @param {Move} move
+   * @return {bool} true if successful, false otherwise
+   */
   applyMove(move) {
     const toLoc = move.getTo();
     const fromLoc = move.getFrom();
@@ -274,6 +361,10 @@ class Board {
     return true;
   }
 
+  /**
+   * @function getPieces get a list of active pieces
+   * @return {[Piece]}
+   */
   getPieces() {
     const pieces = [];
     for (let i = 0; i < this.board.length; i += 1) {
@@ -287,6 +378,10 @@ class Board {
     return pieces;
   }
 
+  /**
+   * @function enPassant active en passant capture for any pawns
+   * @return {bool} true if any pawns are captured via en passant
+   */
   enPassant() {
     const pieces = this.getPieces();
     for (let i = 0; i < pieces.length; i += 1) {
@@ -328,6 +423,10 @@ class Board {
     return false;
   }
 
+  /**
+   * @function isPromotion determine if any pawns are eligible to promote
+   * @return {bool}
+   */
   isPromotion() {
     const pieces = this.getPieces();
     for (let i = 0; i < pieces.length; i += 1) {
@@ -339,6 +438,10 @@ class Board {
     return false;
   }
 
+  /**
+   * @function isCheck determine if current player is in check
+   * @return {bool}
+   */
   isCheck() {
     let kingPos = null;
     const pieces = this.getPieces();
@@ -359,6 +462,10 @@ class Board {
     return this.isUnderAttack(kingPos);
   }
 
+  /**
+   * @function isCheckmate determine if player is in checkmate
+   * @return {bool}
+   */
   isCheckmate() {
     // 1. If board.isCheck() is false, return false
     if (!(this.isCheck())) {
@@ -384,6 +491,10 @@ class Board {
     return true;
   }
 
+  /**
+   * @function isStalemate determine if player is in stalemate
+   * @return {bool}
+   */
   isStalemate() {
     if (this.isCheck()) {
       return false;
@@ -405,10 +516,21 @@ class Board {
     return true;
   }
 
+  /**
+   * @function isOccupied determine if a piece occupies location
+   * @param {int} row
+   * @param {int} col
+   * @return {bool}
+   */
   isOccupied(row, col) {
     return row >= 0 && row < 8 && col >= 0 && col < 8 && this.getPiece([row, col]) !== null;
   }
 
+  /**
+   * @function isInBounds determine if move is in legal bounds
+   * @param {Move} move
+   * @return {bool}
+   */
   isInBounds(move) {
     const to = move.getTo();
     const from = move.getFrom();
@@ -418,6 +540,11 @@ class Board {
       && from[1] >= 0 && from[1] < 8);
   }
 
+  /**
+   * @function isUnderAttack determine if a square is attacked by enemy piece
+   * @param {[Int]} loc
+   * @return {bool}
+   */
   isUnderAttack(loc) {
     const opponent = this.getOpponent();
     const pieces = this.getPieces();
@@ -439,6 +566,11 @@ class Board {
     return false;
   }
 
+  /**
+   * @function mayCastle determine if player may castle in given direction
+   * @param {String} direction
+   * @return {bool}
+   */
   mayCastle(direction) {
     // 1. The castling must be kingside or queenside
     if (direction !== castleLeft && direction !== castleRight) {
@@ -502,6 +634,11 @@ class Board {
     return !result;
   }
 
+  /**
+   * @function applyCastle castle in given direction if possible
+   * @param {String} direction side to castle
+   * @return {bool} true if castle was successful
+   */
   applyCastle(direction) {
     const result = this.mayCastle(direction);
     if (result) {
@@ -535,6 +672,11 @@ class Board {
     return result;
   }
 
+  /**
+   * @function applyPromotion promote a promotable piece
+   * @param {String} promoteType new piece to promote to
+   * @return {bool} true if promotion was successful
+   */
   applyPromotion(promoteType) {
     const pieces = this.getPieces();
     let toPromote = null;
@@ -583,6 +725,11 @@ class Board {
     return true;
   }
 
+  /**
+   * @function updateMove check if move causes checkmate or check, update it
+   * @param {Move} move
+   * @return {Move}
+   */
   updateMove(move) {
     if (this.isCheckmate()) {
       move.setCheckmate();
@@ -592,6 +739,10 @@ class Board {
     return move;
   }
 
+  /**
+   * @function applyDraw end game in a draw
+   * @return {bool} true
+   */
   applyDraw() {
     const move = new Move(null, null);
     move.setType(moveDraw);
@@ -599,6 +750,11 @@ class Board {
     return true;
   }
 
+  /**
+   * @function undo undo a given number of moves
+   * @param {int} numMoves number of moves to undo
+   * @return {bool} true if undo was successful
+   */
   undo(numMoves) {
     let hist = this.getHistory();
     if (numMoves > hist.length) {

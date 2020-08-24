@@ -1,12 +1,23 @@
 const { Piece } = require('./piece.js');
 
 class Queen extends Piece {
+  /**
+   * @function constructor creates a new Queen
+   * @param {String} c color of piece
+   * @param {[int]} p position of piece
+   * @return Queen
+   */
   constructor(c, p) {
     super(c, p);
     this.name = 'queen';
     this.abbreviation = 'Q';
   }
 
+  /**
+   * @function getMoves returns a list of valid moves
+   * @param {Board} b a board object
+   * @return [Move]
+   */
   getMoves(b) {
     let moves = [];
     // Up-Right Diag

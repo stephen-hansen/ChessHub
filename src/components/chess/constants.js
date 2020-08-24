@@ -11,6 +11,9 @@ const moveCastle = 'castle';
 const movePromotion = 'promotion';
 const moveDraw = 'draw';
 
+// Just some constant declarations, for use
+// throughout the project.
+
 module.exports = {
   white,
   black,

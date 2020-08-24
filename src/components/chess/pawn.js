@@ -3,6 +3,12 @@ const { Move } = require('./move.js');
 const { black, white } = require('./constants.js');
 
 class Pawn extends Piece {
+  /**
+   * @function constructor creates a new Pawn
+   * @param {String} c color of piece
+   * @param {[int]} p position of piece
+   * @return Pawn
+   */
   constructor(c, p) {
     super(c, p);
     this.name = 'pawn';
@@ -10,6 +16,10 @@ class Pawn extends Piece {
     this.promote = false;
   }
 
+  /**
+   * @function setPosition update pawn position, track en passant, promotion
+   * @param {[int]} p new position
+   */
   setPosition(p) {
     const prevRow = this.getPosition()[0];
     super.setPosition(p);
@@ -27,18 +37,34 @@ class Pawn extends Piece {
     }
   }
 
+  /**
+   * @function disableEnPassant disable en passant state of pawn
+   */
   disableEnPassant() {
     this.enPassant = false;
   }
 
+  /**
+   * @function isEnPassant is pawn eligible for en passant capture
+   * @return {bool}
+   */
   isEnPassant() {
     return this.enPassant;
   }
 
+  /**
+   * @function canPromote is pawn eligible for promotion
+   * @return {bool}
+   */
   canPromote() {
     return this.promote;
   }
 
+  /**
+   * @function getMoves returns a list of valid moves
+   * @param {Board} b a board object
+   * @return [Move]
+   */
   getMoves(b) {
     const moves = [];
     const row = this.getPosition()[0];
