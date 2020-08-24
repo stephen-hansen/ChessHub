@@ -58,7 +58,8 @@ io.on('connection', (socket) => {
     } else if (Object.keys(games[gameId].players).length >= 2
       && !Object.keys(games[gameId].players).includes(username)) {
       io.to(socket.id).emit('gameFull');
-    } else if (Object.keys(games[gameId].players).includes(username)) {
+    } else if (Object.keys(games[gameId].players).includes(username)
+      && Object.keys(games[gameId].players).length === 2) {
       // reconnect
       socket.join(gameId);
       const user = games[gameId].players[username];
@@ -67,7 +68,7 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit('game', `player=${user.color}`);
       io.to(socket.id).emit('gameStart', games[gameId].state);
       socketIdsToUsers[socket.id] = user;
-    } else {
+    } else if (!Object.keys(games[gameId].players).includes(username)) {
       socket.join(gameId);
       const user = new User(socket.id, username, gameId);
       /** In case we want to randomize colors
