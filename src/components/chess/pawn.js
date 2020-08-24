@@ -19,10 +19,10 @@ class Pawn extends Piece {
       this.enPassant = !this.enPassant;
     }
     if (this.getColor() === white && newRow === 0) {
-      this.promote = true;
+      this.promote = !this.promote;
     }
     if (this.getColor() === black && newRow === 7) {
-      this.promote = true;
+      this.promote = !this.promote;
     }
   }
 
