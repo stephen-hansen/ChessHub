@@ -5,6 +5,14 @@ Status](https://coveralls.io/repos/github/stephen-hansen/SE-181-Team-Project/bad
 
 # ChessHub: Multiplayer Remote Chess
 
+## Running:
+
+You will need the latest versions of `nodejs` and `npm` for your platform.
+
+Use `npm install` to install package dependencies, then run the server with `npm run start-server`,
+and in a separate shell run the client with `npm run start-client`. You may now connect to
+`localhost:3000` to use ChessHub.
+
 ## Release Notes:
 
 Please see the Release Notes PDF document in the repository.
