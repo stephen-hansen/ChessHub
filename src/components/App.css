@@ -38,7 +38,7 @@ td {
 .castleMenu {
   position: absolute;
   top: 300px;
-  left: 300px;
+  left: 400px;
 }
 
 .undoMenu {
@@ -200,5 +200,5 @@ button{
   position: absolute;
   max-height: 200px;
   width: 100vw;
-  bottom: 0;
+  top: 900px;
 }
