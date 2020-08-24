@@ -16,6 +16,9 @@ class App extends React.Component {
       <Game />
       </Route>
       </Switch>
+      <div className="footer">
+      <p>About: Version 1.0-beta1 (beta candidate)</p>
+      </div>
       </Router>
     );
   }

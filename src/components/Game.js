@@ -566,7 +566,6 @@ class Game extends React.Component {
       socket={this.socket}
       />
       </div>
-
       </div>
     );
   }
