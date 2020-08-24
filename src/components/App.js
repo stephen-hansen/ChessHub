@@ -17,7 +17,7 @@ class App extends React.Component {
       </Route>
       </Switch>
       <div className="footer">
-      <p>About: Version 1.0-beta1 (beta candidate)</p>
+      <p>About: Version 1.0 (release candidate)</p>
       </div>
       </Router>
     );
