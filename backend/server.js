@@ -106,6 +106,28 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('promotion', (data) => {
+    // find room that socket that needs to be synced
+    const { move, promotion } = data;
+    const { gameId } = socketIdsToUsers[socket.id];
+    const { board } = games[gameId].state;
+    const nMove = new Move(move.from, move.to);
+    // apply move to server representation of board
+    if (board.applyMove(nMove)) {
+      // sync the board with everyone in the room
+      if (board.applyPromotion(promotion)) {
+        io.sockets.in(gameId).emit('syncPromotion', data);
+      } else {
+        io.sockets.in(gameId).emit('syncBoard', move);
+      }
+      if (board.isCheckmate()) {
+        io.sockets.in(gameId).emit('checkmate', (board.getOpponent()));
+      } else if (board.isStalemate()) {
+        io.sockets.in(gameId).emit('stalemate', (board.getTurn()));
+      }
+    }
+  });
+
   socket.on('syncCastle', (move) => {
     // find room that socket that needs to be synced
     // 1. apply move to the chesslib.Board

@@ -7,6 +7,7 @@ import Chat from './Chat';
 import Loading from './Loading';
 import CastleMenu from './CastleMenu';
 import UndoMenu from './UndoMenu';
+import PromoteMenu from './PromoteMenu';
 
 import { Board as LibBoard } from './chess/board';
 import { Pawn } from './chess/pawn';
@@ -49,14 +50,17 @@ class Game extends React.Component {
       board: this.libBoard.getRepresentation(),
       history: this.libBoard.getSANHistory(),
       highlighted: [],
+      promoteVisible: 'hidden',
       leftCastleVisible: 'hidden',
       rightCastleVisible: 'hidden',
       startUndoVisible: 'hidden',
       respondUndoVisible: 'hidden',
       whiteDeaths: this.libBoard.inactiveWhite,
       blackDeaths: this.libBoard.inactiveBlack,
+      promotePieces: [],
+      latestMove: null,
       player: null,
-      turn: 0,
+      turn: false,
       info: '',
       currentSource: [],
     };
@@ -145,6 +149,10 @@ class Game extends React.Component {
         rightCastleVisible: (this.libBoard.getTurn() === this.state.player && this.libBoard.mayCastle(castleRight)) ? 'visible' : 'hidden',
         startUndoVisible: 'hidden',
         respondUndoVisible: 'hidden',
+        promotePieces: [new Queen(this.state.player, [0, 0]),
+          new Knight(this.state.player, [0, 0]),
+          new Bishop(this.state.player, [0, 0]),
+          new Rook(this.state.player, [0, 0])],
       });
       // Should undos persist on refresh?
     });
@@ -155,6 +163,19 @@ class Game extends React.Component {
         return;
       }
       if (this.libBoard.applyMove(deserializedMove)) {
+        this.synchronize();
+        this.highlightMove(deserializedMove);
+      }
+    });
+    this.socket.on('syncPromotion', (data) => {
+      const { move, promotion, color } = data;
+      const deserializedMove = new Move(move.from, move.to);
+      const piece = this.libBoard.getPiece(move.from);
+      if (piece === null || color === this.state.player || piece.getColor() === this.state.player) {
+        return;
+      }
+      if (this.libBoard.applyMove(deserializedMove)) {
+        this.libBoard.applyPromotion(promotion);
         this.synchronize();
         this.highlightMove(deserializedMove);
       }
@@ -300,6 +321,32 @@ class Game extends React.Component {
     this.socket.emit('respondToUndo', { confirm: answer });
   }
 
+  handlePromote(name) {
+    if (this.state.locked) {
+      const t = this.libBoard.getTurn();
+      if (this.state.player !== t) {
+        this.setState({
+          info: 'It is not your turn!',
+        });
+        return;
+      }
+      this.setState({ info: '' });
+      if (this.libBoard.applyPromotion(name)) {
+        const move = this.state.latestMove;
+        this.libBoard.setTurn(this.libBoard.getOpponent());
+        this.synchronize();
+        // sync the library version of the board alongside the move that just occured
+        this.socket.emit('promotion', { move, promotion: name, color: this.state.player });
+        this.highlightMove(move);
+        this.setState({
+          latestMove: null,
+          promoteVisible: 'hidden',
+          locked: false,
+        });
+      }
+    }
+  }
+
   handleCastle(direction) {
     if (!this.state.locked) {
       const t = this.libBoard.getTurn();
@@ -349,15 +396,27 @@ class Game extends React.Component {
         const move = new Move(this.state.currentSource, [row, col]);
         if (this.libBoard.applyMove(move)) {
           this.synchronize();
-          // sync the library version of the board alongside the move that just occured
-          this.socket.emit('sync', {
-            move,
-          });
           this.setState({
             hasPlayed: true,
           });
           this.highlightMove(move);
           this.selectedPiece = !this.selectedPiece;
+          // Need to promote
+          if (this.libBoard.isPromotion()) {
+            this.libBoard.setTurn(this.state.player);
+            this.setState({
+              locked: true,
+              latestMove: move,
+              promoteVisible: 'visible',
+              turn: this.state.turn,
+            });
+            // Control flow moves to handlePromote
+          } else {
+            // sync the library version of the board alongside the move that just occured
+            this.socket.emit('sync', {
+              move,
+            });
+          }
         } else {
           // If user selects a different piece, set it to be current
           const pieceAtClick = this.libBoard.getPiece([row, col]);
@@ -466,6 +525,15 @@ class Game extends React.Component {
       }
       declineUndo = {
         () => this.respondToUndo(false)
+      }
+      />
+      </div>
+      <div className = "game-column promoteMenu" >
+      <PromoteMenu
+      visible = {this.state.promoteVisible}
+      pieces = {this.state.promotePieces}
+      onClick = {
+        (name) => this.handlePromote(name)
       }
       />
       </div>
