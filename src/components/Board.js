@@ -25,7 +25,8 @@ class Board extends React.Component {
         rows.push(this.renderSquare((i * 16) + j * 2, 'light-square', 2 * i, 2 * j));
         rows.push(this.renderSquare((i * 16) + (j * 2) + 1, 'dark-square', 2 * i, 2 * j + 1));
       }
-      board.push(<div key={count}>{rows}</div>);
+      let rank = 8 - 2 * i;
+      board.push(<div key={count}><button className='textsquare'>{rank}</button>{rows}</div>);
       count += 1;
 
       const rows2 = [];
@@ -33,12 +34,24 @@ class Board extends React.Component {
         rows2.push(this.renderSquare((i * 16) + 8 + k * 2, 'dark-square', 2 * i + 1, 2 * k));
         rows2.push(this.renderSquare((i * 16) + 8 + (k * 2) + 1, 'light-square', 2 * i + 1, 2 * k + 1));
       }
-      board.push(<div key={count}>{rows2}</div>);
+      rank = 8 - (2 * i + 1);
+      board.push(<div key={count}><button className='textsquare'>{rank}</button>{rows2}</div>);
       count += 1;
     }
     return (
       <div>
       {board}
+      <div>
+      <button className='textsquare'></button>
+      <button className='textsquare'>a</button>
+      <button className='textsquare'>b</button>
+      <button className='textsquare'>c</button>
+      <button className='textsquare'>d</button>
+      <button className='textsquare'>e</button>
+      <button className='textsquare'>f</button>
+      <button className='textsquare'>g</button>
+      <button className='textsquare'>h</button>
+      </div>
       </div>
     );
   }
