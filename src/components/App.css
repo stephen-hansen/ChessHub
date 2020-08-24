@@ -47,6 +47,11 @@ td {
   margin-left: 10px;
 }
 
+.resignMenu {
+  position: absolute;
+  left: 10px;
+}
+
 .promoteMenu {
   position: absolute;
   top: 650px;

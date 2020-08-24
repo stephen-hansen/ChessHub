@@ -8,6 +8,7 @@ import Loading from './Loading';
 import CastleMenu from './CastleMenu';
 import UndoMenu from './UndoMenu';
 import PromoteMenu from './PromoteMenu';
+import ResignMenu from './ResignMenu';
 
 import { Board as LibBoard } from './chess/board';
 import { Pawn } from './chess/pawn';
@@ -258,6 +259,20 @@ class Game extends React.Component {
         respondUndoVisible: 'visible',
       });
     });
+    this.socket.on('syncResign', (data) => {
+      const name = data === white ? 'White' : 'Black';
+      this.setState({
+        info: `${name} has resigned!`,
+        locked: true,
+        mayUndo: false,
+        startUndoVisible: 'hidden',
+        promoteVisible: 'hidden',
+      });
+    });
+  }
+
+  resign() {
+    this.socket.emit('resign', { color: this.state.player });
   }
 
   synchronize() {
@@ -534,6 +549,13 @@ class Game extends React.Component {
       pieces = {this.state.promotePieces}
       onClick = {
         (name) => this.handlePromote(name)
+      }
+      />
+      </div>
+      <div className = "game-column resignMenu" >
+      <ResignMenu
+      onClick = {
+        () => this.resign()
       }
       />
       </div>
