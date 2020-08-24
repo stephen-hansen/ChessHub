@@ -1,0 +1,25 @@
+Static Analysis Documentation:
+
+For static analysis we are using eslint with the airbnb-base style guide along
+with extensions to support common React.js and Jest functionality. You
+may run the static analysis by downloading the required packages (`npm
+install`) and then running `npx eslint backend/ src/` to run static analysis
+on all project files. 
+
+The static analysis output is below. Note that serviceWorker.js is a file
+generated and required by React.js, hence the error and warnings. Otherwise,
+all of our hand-written code has no warnings and errors when run through
+the static analyzer (note that eslint does not show files with no errors and
+no warnings).
+
+/mnt/c/Users/HANSEN4/Documents/SE-181-Team-Project/src/serviceWorker.js
+   44:11  warning  Unexpected console statement                                 no-console
+   61:7   error    Assignment to property of function parameter 'registration'  no-param-reassign
+   72:15  warning  Unexpected console statement                                 no-console
+   85:15  warning  Unexpected console statement                                 no-console
+   97:7   warning  Unexpected console statement                                 no-console
+  125:7   warning  Unexpected console statement                                 no-console
+  138:9   warning  Unexpected console statement                                 no-console
+
+✖ 7 problems (1 error, 6 warnings)
+

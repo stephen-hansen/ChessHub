@@ -1,0 +1,63 @@
+Coverage Documentation:
+
+We are using Jest to run unit tests and generate coverage reports. Our
+repository is synced with Travis CI to provide automatic testing so that
+each commit runs unit tests via Travis CI and then sends code coverage
+report to Coveralls. Our coverage report according to Jest is
+provided below. The Coveralls report is included as a picture
+coveralls.png included with the submission. You may run the tests used 
+to generate the coverage report with `npm run coverage`.
+
+Coverage Report (via Jest):
+
+> SE-181-Team-Project@1.0.0 coverage /mnt/c/Users/HANSEN4/Documents/SE-181-Team-Project
+> jest --coverage ./src/components/chess
+
+PASS src/components/chess/board.test.js
+  ✓ board initializes to default board layout (33ms)
+  ✓ accepted pawn moves (127ms)
+  ✓ rejected pawn moves (9ms)
+  ✓ accepted rook moves (9ms)
+  ✓ rejected rook moves (3ms)
+  ✓ accepted bishop moves (6ms)
+  ✓ rejected bishop moves (1ms)
+  ✓ accepted knight moves (25ms)
+  ✓ rejected knight moves (6ms)
+  ✓ accepted queen moves (52ms)
+  ✓ rejected queen moves (6ms)
+  ✓ accepted king moves (11ms)
+  ✓ rejected king moves (6ms)
+  ✓ detect check in move validation (1ms)
+  ✓ detect checkmate (43ms)
+  ✓ detect stalemate (2ms)
+  ✓ pawn promotion (9ms)
+  ✓ initial pawn move (7ms)
+  ✓ en passant capture (7ms)
+  ✓ castle left/right (28ms)
+  ✓ piece ADT does not have moves (9ms)
+  ✓ undo moves (143ms)
+  ✓ get board representation (2ms)
+  ✓ get valid moves (11ms)
+  ✓ SAN history (157ms)
+  ✓ apply draw (1ms)
+
+--------------|----------|----------|----------|----------|-------------------|
+File          |  % Stmts | % Branch |  % Funcs |  % Lines | Uncovered Line #s |
+--------------|----------|----------|----------|----------|-------------------|
+All files     |      100 |      100 |      100 |      100 |                   |
+ bishop.js    |      100 |      100 |      100 |      100 |                   |
+ board.js     |      100 |      100 |      100 |      100 |                   |
+ constants.js |      100 |      100 |      100 |      100 |                   |
+ king.js      |      100 |      100 |      100 |      100 |                   |
+ knight.js    |      100 |      100 |      100 |      100 |                   |
+ move.js      |      100 |      100 |      100 |      100 |                   |
+ pawn.js      |      100 |      100 |      100 |      100 |                   |
+ piece.js     |      100 |      100 |      100 |      100 |                   |
+ queen.js     |      100 |      100 |      100 |      100 |                   |
+ rook.js      |      100 |      100 |      100 |      100 |                   |
+--------------|----------|----------|----------|----------|-------------------|
+Test Suites: 1 passed, 1 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        6.363s
+Ran all test suites matching /.\/src\/components\/chess/i.

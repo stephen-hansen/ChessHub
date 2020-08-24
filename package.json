@@ -1,0 +1,80 @@
+{
+  "name": "SE-181-Team-Project",
+  "version": "1.0.0",
+  "description": "Helpful https://socket.io/docs/emit-cheatsheet/",
+  "scripts": {
+    "test": "jest --coverage ./src/components/chess && coveralls < coverage/lcov.info",
+    "coverage": "jest --coverage ./src/components/chess",
+    "dev": "(cd ./backend && nodemon server.js)",
+    "start-server": "(cd ./backend && node server.js)",
+    "start-client": "(react-scripts start)",
+    "start": "(cd ./backend && node server.js) & (react-scripts start)",
+    "build": "(react-scripts build)",
+    "eject": "(react-scripts eject)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephen-hansen/SE-181-Team-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stephen-hansen/SE-181-Team-Project/issues"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.1",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
+  },
+  "devDependencies": {
+    "coveralls": "^3.1.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-react-app": "^6.2.2",
+    "eslint-plugin-jest": "^23.20.0",
+    "nodemon": "^2.0.4"
+  },
+  "eslintConfig": {
+    "plugins": [
+      "jest"
+    ],
+    "env": {
+      "browser": true,
+      "node": true,
+      "jest/globals": true,
+      "es2020": true
+    },
+    "extends": [
+      "plugin:jest/recommended",
+      "airbnb-base",
+      "react-app"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 11,
+      "sourceType": "module"
+    },
+    "root": true
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -1,0 +1,204 @@
+table {
+  width: 100%;
+}
+
+table, td {
+  border-collapse: collapse;
+}
+
+thead {
+  display: table;
+  width: calc(100% - 17px);
+}
+
+tbody {
+  display: block;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+th, td {
+  width: 33.33%;
+  padding: 5px;
+  word-break: break-all;
+}
+
+tr {
+  display: table;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+td {
+  text-align: center;
+  border-bottom: none;
+  border-left: none;
+}
+
+.castleMenu {
+  position: absolute;
+  top: 300px;
+  left: 300px;
+}
+
+.undoMenu {
+  position: absolute;
+  top: 320px;
+  margin-left: 10px;
+}
+
+.resignMenu {
+  position: absolute;
+  left: 10px;
+}
+
+.promoteMenu {
+  position: absolute;
+  top: 650px;
+  left: 500px;
+}
+
+.respond {
+  position: relative;
+  top: -100px;
+}
+
+.info {
+  position: absolute;
+  right: 0;
+}
+
+input {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 40px 0;
+  box-sizing: border-box;
+  border-radius: 10px;
+  align-items: center;
+  background-color: #333333;
+  color: white;
+  font-size: large;
+}
+
+body{
+    font-family: "Candara";
+    font-size: 18px;
+    background-color: #c4ced4;
+    color: #333333;
+    text-align: center;
+}
+button{
+  /* background-color:#333333; */
+  background-color: #70a2a3;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  font-size: 16px;
+  border-radius: 10px;
+  align-items: center;
+
+}
+
+.action{
+  width: 500px;
+  margin: 0 auto;
+}
+
+.textsquare {
+  background: transparent;
+  border: 0px solid transparent;
+  /* float: center; */
+  float: center;
+  color: black;
+  font-size: 34px;
+  font-weight: bold;
+  line-height: 34px;
+  margin-right: -1px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: none;
+  text-align: center;
+  width: 60px;
+  height: 60px;
+}
+
+.square {
+  background: transparent;
+  border: 0px solid transparent;
+  /* float: center; */
+  float: center;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  margin-right: -1px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: none;
+  text-align: center;
+  width: 60px;
+  height: 60px;
+}
+
+/* theme coral from http://omgchess.blogspot.com/2015/09/ */
+.dark-square {
+  background-color: #70a2a3;
+}
+
+.light-square {
+  background-color: #B1E4B9;
+}
+
+.highlighted {
+  border: 1px solid black;
+  background-color:khaki;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.header {
+  border-radius: 10px;
+  text-align: center;
+  background: #7694AB;
+  color: white;
+  font-size: 30px;
+  font-family: "Candara";
+}
+
+.footer {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  border-radius: 10px;
+  text-align: center;
+  background: #7694AB;
+  color: white;
+  font-size: 16px;
+  font-family: "Candara";
+}
+
+.nun {
+  border: 1px solid black;
+}
+
+.game-column {
+  float: left;
+  width: 50%;
+}
+
+.gamePage {
+  height: 100vh;
+  position: relative;
+}
+
+.chat {
+  position: absolute;
+  max-height: 200px;
+  width: 100vw;
+  bottom: 0;
+}
